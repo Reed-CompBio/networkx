@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Hashable, Any, TypeVar, Generic, Callable
 from functools import wraps
 
@@ -66,7 +67,21 @@ class ContentWrapper(Hashable, Generic[_T]):
 
     # stringify
     def __repr__(self):
-        return repr(self.content)
+        return f"{self.__class__.__name__}({repr(self.content)})"
 
     def __str__(self):
-        return f"{self.__class__.__name__}({str(self.content)})"
+        return str(self.content)
+
+    def __copy__(self):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo=memo))
+        return result
