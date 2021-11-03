@@ -3,7 +3,9 @@ import pytest
 
 
 class TestContentWrapper:
-    @pytest.mark.parametrize('obj, error', [pytest.param(1, None), pytest.param([], TypeError)])
+    @pytest.mark.parametrize(
+        "obj, error", [pytest.param(1, None), pytest.param([], TypeError)]
+    )
     def test_hashable_check(self, obj, error):
         if error is not None:
             with pytest.raises(error):
@@ -12,10 +14,10 @@ class TestContentWrapper:
             c = ContentWrapper(obj)
 
     @pytest.mark.parametrize(
-        'obj, error',
+        "obj, error",
         [
             pytest.param(1, None),
-        ]
+        ],
     )
     def test_equal(self, obj, error):
         c = ContentWrapper(obj)
@@ -25,4 +27,3 @@ class TestContentWrapper:
                 assert c == obj
         else:
             assert c == obj
-

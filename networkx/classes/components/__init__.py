@@ -1,2 +1,3 @@
 from .node import Node
-__all__ = ['Node']
+
+__all__ = ["Node"]

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Hashable, Any, TypeVar, Generic, Callable
 from functools import wraps
 
-_T = TypeVar('_T', covariant=True, bound=Hashable)
+_T = TypeVar("_T", covariant=True, bound=Hashable)
 
 
 def _content_biop_function_caller(fn: Callable) -> Callable:
@@ -14,13 +14,14 @@ def _content_biop_function_caller(fn: Callable) -> Callable:
             return cmp_fn(other.content)
         else:
             return cmp_fn(other)
+
     return _helper
 
 
 class ContentWrapper(Hashable, Generic[_T]):
     def __init__(self, content: _T) -> None:
         if not isinstance(content, Hashable):
-            raise TypeError(f'{content} is not Hashable.')
+            raise TypeError(f"{content} is not Hashable.")
         self._content = content
 
     @property
@@ -68,4 +69,4 @@ class ContentWrapper(Hashable, Generic[_T]):
         return repr(self.content)
 
     def __str__(self):
-        return f'{self.__class__.__name__}({str(self.content)})'
+        return f"{self.__class__.__name__}({str(self.content)})"

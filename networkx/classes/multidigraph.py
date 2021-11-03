@@ -18,7 +18,6 @@ import networkx.convert as convert
 __all__ = ["MultiDiGraph"]
 
 
-
 class MultiDiGraph(MultiGraph, DiGraph):
     """A directed graph class that can store multiedges.
 
