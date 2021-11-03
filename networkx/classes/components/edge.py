@@ -14,7 +14,7 @@ class Edge(ContentWrapper[Tuple[Node, Node, bool]]):
             v = Node(v)
 
         if not isinstance(directed, bool):
-            raise ValueError('directed argument has to be bool')
+            raise ValueError("directed argument has to be bool")
 
         super(Edge, self).__init__((u, v, directed))
 

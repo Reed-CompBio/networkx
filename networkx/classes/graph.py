@@ -1974,7 +1974,9 @@ class Graph:
         elif data_len == 3:
             data = args
         else:
-            raise ValueError('to_edge accepts a tuple or two nodes w/ or w/o directed info')
+            raise ValueError(
+                "to_edge accepts a tuple or two nodes w/ or w/o directed info"
+            )
 
         data_len = len(data)
         if data_len == 2:
@@ -1983,6 +1985,6 @@ class Graph:
         elif data_len == 3:
             u, v, directed = data
         else:
-            raise ValueError('to_edge only accepts two nodes w/ or w/o directed info')
+            raise ValueError("to_edge only accepts two nodes w/ or w/o directed info")
 
         return Edge(u, v, directed)
