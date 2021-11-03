@@ -15,7 +15,7 @@ from networkx.classes.reportviews import NodeView, EdgeView, DegreeView
 from networkx.exception import NetworkXError
 import networkx.convert as convert
 
-from .components import Node
+from .components import Node, Edge
 
 __all__ = ["Graph"]
 
@@ -1963,3 +1963,26 @@ class Graph:
             return n
         else:
             return Node(n)
+
+    @classmethod
+    def to_edge(cls, *args):
+        data_len = len(args)
+        if data_len == 1:
+            data = args[0]
+        elif data_len == 2:
+            data = args
+        elif data_len == 3:
+            data = args
+        else:
+            raise ValueError('to_edge accepts a tuple or two nodes w/ or w/o directed info')
+
+        data_len = len(data)
+        if data_len == 2:
+            u, v = data
+            directed = False
+        elif data_len == 3:
+            u, v, directed = data
+        else:
+            raise ValueError('to_edge only accepts two nodes w/ or w/o directed info')
+
+        return Edge(u, v, directed)
