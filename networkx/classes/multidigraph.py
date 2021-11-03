@@ -3,7 +3,6 @@ from copy import deepcopy
 
 import networkx as nx
 from .digraph import DiGraph
-from .components import Node
 from .multigraph import MultiGraph
 from networkx.classes.coreviews import MultiAdjacencyView
 from networkx.classes.reportviews import (
@@ -469,11 +468,8 @@ class MultiDiGraph(MultiGraph, DiGraph):
         if u is None or v is None:
             raise ValueError("None cannot be a node")
 
-        if not isinstance(u, Node):
-            u = Node(u)
-
-        if not isinstance(v, Node):
-            v = Node(v)
+        u = self.to_node(u)
+        v = self.to_node(v)
 
         if u not in self._succ:
             self._succ[u] = self.adjlist_inner_dict_factory()

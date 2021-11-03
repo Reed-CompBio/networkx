@@ -3,7 +3,6 @@ from copy import deepcopy
 
 import networkx as nx
 
-from .components import Node
 from .graph import Graph
 from networkx.classes.coreviews import AdjacencyView
 from networkx.classes.reportviews import (
@@ -420,8 +419,7 @@ class DiGraph(Graph):
         if node_for_adding is None:
             raise ValueError("None cannot be a node")
 
-        if not isinstance(node_for_adding, Node):
-            node_for_adding = Node(node_for_adding)
+        node_for_adding = self.to_node(node_for_adding)
 
         if node_for_adding not in self._succ:
             self._succ[node_for_adding] = self.adjlist_inner_dict_factory()
