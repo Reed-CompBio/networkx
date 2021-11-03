@@ -13,23 +13,25 @@ if sys.version_info[:2] < (3, 7):
     sys.exit(1)
 
 
-name = "networkx"
-description = "Python package for creating and manipulating graphs and networks"
+name = "networkg"
+description = "A customized version of networkx"
 authors = {
     "Hagberg": ("Aric Hagberg", "hagberg@lanl.gov"),
     "Schult": ("Dan Schult", "dschult@colgate.edu"),
     "Swart": ("Pieter Swart", "swart@lanl.gov"),
+    "Zeng": ("Larry Zeng", "zengl@reed.edu")
 }
-maintainer = "NetworkX Developers"
-maintainer_email = "networkx-discuss@googlegroups.com"
-url = "https://networkx.org/"
+maintainer = "Graphery Developers"
+maintainer_email = "graphery@reed.edu"
+url = "https://graphery.reedcompbio.org/"
 project_urls = {
-    "Bug Tracker": "https://github.com/networkx/networkx/issues",
+    "Bug Tracker": "https://github.com/Reed-CompBio/networkx/issues",
     "Documentation": "https://networkx.org/documentation/stable/",
-    "Source Code": "https://github.com/networkx/networkx",
+    "Source Code": "https://github.com/Reed-CompBio/networkx",
 }
 platforms = ["Linux", "Mac OSX", "Windows", "Unix"]
 keywords = [
+    "Graphery",
     "Networks",
     "Graph Theory",
     "Mathematics",
@@ -178,8 +180,8 @@ if __name__ == "__main__":
         version=version,
         maintainer=maintainer,
         maintainer_email=maintainer_email,
-        author=authors["Hagberg"][0],
-        author_email=authors["Hagberg"][1],
+        author=authors["Zeng"][0],
+        author_email=authors["Zeng"][1],
         description=description,
         keywords=keywords,
         long_description=long_description,

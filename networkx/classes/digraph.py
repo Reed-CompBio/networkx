@@ -2,7 +2,8 @@
 from copy import deepcopy
 
 import networkx as nx
-from networkx.classes.graph import Graph
+
+from .graph import Graph
 from networkx.classes.coreviews import AdjacencyView
 from networkx.classes.reportviews import (
     OutEdgeView,
@@ -415,15 +416,20 @@ class DiGraph(Graph):
         NetworkX Graphs, though one should be careful that the hash
         doesn't change on mutables.
         """
+        if node_for_adding is None:
+            raise ValueError("None cannot be a node")
+
+        node_for_adding = self.to_node(node_for_adding)
+
         if node_for_adding not in self._succ:
-            if node_for_adding is None:
-                raise ValueError("None cannot be a node")
             self._succ[node_for_adding] = self.adjlist_inner_dict_factory()
             self._pred[node_for_adding] = self.adjlist_inner_dict_factory()
             attr_dict = self._node[node_for_adding] = self.node_attr_dict_factory()
             attr_dict.update(attr)
         else:  # update attr even if node already exists
             self._node[node_for_adding].update(attr)
+
+        return node_for_adding
 
     def add_nodes_from(self, nodes_for_adding, **attr):
         """Add multiple nodes.
@@ -469,6 +475,7 @@ class DiGraph(Graph):
         11
 
         """
+        node_list = []
         for n in nodes_for_adding:
             try:
                 newnode = n not in self._node
@@ -478,13 +485,19 @@ class DiGraph(Graph):
                 newnode = n not in self._node
                 newdict = attr.copy()
                 newdict.update(ndict)
+
+            if n is None:
+                raise ValueError("None cannot be a node")
+
+            n = self.to_node(n)
+
             if newnode:
-                if n is None:
-                    raise ValueError("None cannot be a node")
                 self._succ[n] = self.adjlist_inner_dict_factory()
                 self._pred[n] = self.adjlist_inner_dict_factory()
                 self._node[n] = self.node_attr_dict_factory()
             self._node[n].update(newdict)
+
+        return node_list
 
     def remove_node(self, n):
         """Remove node n.
@@ -616,16 +629,19 @@ class DiGraph(Graph):
         >>> G.edges[1, 2].update({0: 5})
         """
         u, v = u_of_edge, v_of_edge
+
+        if u is None or v is None:
+            raise ValueError("None cannot be a node")
+
+        u = self.to_node(u)
+        v = self.to_node(v)
+
         # add nodes
         if u not in self._succ:
-            if u is None:
-                raise ValueError("None cannot be a node")
             self._succ[u] = self.adjlist_inner_dict_factory()
             self._pred[u] = self.adjlist_inner_dict_factory()
             self._node[u] = self.node_attr_dict_factory()
         if v not in self._succ:
-            if v is None:
-                raise ValueError("None cannot be a node")
             self._succ[v] = self.adjlist_inner_dict_factory()
             self._pred[v] = self.adjlist_inner_dict_factory()
             self._node[v] = self.node_attr_dict_factory()
@@ -634,6 +650,8 @@ class DiGraph(Graph):
         datadict.update(attr)
         self._succ[u][v] = datadict
         self._pred[v][u] = datadict
+
+        return u, v
 
     def add_edges_from(self, ebunch_to_add, **attr):
         """Add all the edges in ebunch_to_add.
@@ -673,6 +691,8 @@ class DiGraph(Graph):
         >>> G.add_edges_from([(1, 2), (2, 3)], weight=3)
         >>> G.add_edges_from([(3, 4), (1, 4)], label="WN2898")
         """
+        edge_list = []
+
         for e in ebunch_to_add:
             ne = len(e)
             if ne == 3:
@@ -682,15 +702,18 @@ class DiGraph(Graph):
                 dd = {}
             else:
                 raise NetworkXError(f"Edge tuple {e} must be a 2-tuple or 3-tuple.")
+
+            if u is None or v is None:
+                raise ValueError("None cannot be a node")
+
+            u = self.to_node(u)
+            v = self.to_node(v)
+
             if u not in self._succ:
-                if u is None:
-                    raise ValueError("None cannot be a node")
                 self._succ[u] = self.adjlist_inner_dict_factory()
                 self._pred[u] = self.adjlist_inner_dict_factory()
                 self._node[u] = self.node_attr_dict_factory()
             if v not in self._succ:
-                if v is None:
-                    raise ValueError("None cannot be a node")
                 self._succ[v] = self.adjlist_inner_dict_factory()
                 self._pred[v] = self.adjlist_inner_dict_factory()
                 self._node[v] = self.node_attr_dict_factory()
@@ -699,6 +722,10 @@ class DiGraph(Graph):
             datadict.update(dd)
             self._succ[u][v] = datadict
             self._pred[v][u] = datadict
+
+            edge_list.append((u, v))
+
+        return edge_list
 
     def remove_edge(self, u, v):
         """Remove the edge between u and v.
