@@ -168,7 +168,7 @@ install_requires = []
 extras_require = {
     dep: parse_requirements_file("requirements/" + dep + ".txt")
     for dep in ["default", "developer", "doc", "extra", "test"]
-}
+}.copy()
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
