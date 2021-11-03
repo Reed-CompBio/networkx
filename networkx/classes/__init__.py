@@ -1,3 +1,4 @@
+from .components import *
 from .graph import Graph
 from .digraph import DiGraph
 from .multigraph import MultiGraph
