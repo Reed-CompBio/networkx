@@ -2,7 +2,9 @@
 from copy import deepcopy
 
 import networkx as nx
-from networkx.classes.graph import Graph
+
+from .components import Node
+from .graph import Graph
 from networkx.classes.coreviews import MultiAdjacencyView
 from networkx.classes.reportviews import MultiEdgeView, MultiDegreeView
 from networkx import NetworkXError
@@ -468,14 +470,20 @@ class MultiGraph(Graph):
         """
         u, v = u_for_edge, v_for_edge
         # add nodes
+        if u is None:
+            raise ValueError("None cannot be a node")
+        if v is None:
+            raise ValueError("None cannot be a node")
+
+        if not isinstance(u, Node):
+            u = Node(u)
+        if not isinstance(v, Node):
+            v = Node(v)
+
         if u not in self._adj:
-            if u is None:
-                raise ValueError("None cannot be a node")
             self._adj[u] = self.adjlist_inner_dict_factory()
             self._node[u] = self.node_attr_dict_factory()
         if v not in self._adj:
-            if v is None:
-                raise ValueError("None cannot be a node")
             self._adj[v] = self.adjlist_inner_dict_factory()
             self._node[v] = self.node_attr_dict_factory()
         if key is None:
