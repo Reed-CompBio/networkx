@@ -67,10 +67,10 @@ class ContentWrapper(Hashable, Generic[_T]):
 
     # stringify
     def __repr__(self):
-        return repr(self.content)
+        return f"{self.__class__.__name__}({repr(self.content)})"
 
     def __str__(self):
-        return f"{self.__class__.__name__}({str(self.content)})"
+        return str(self.content)
 
     def __copy__(self):
         cls = self.__class__

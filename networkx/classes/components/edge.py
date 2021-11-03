@@ -19,7 +19,7 @@ class Edge(ContentWrapper[Tuple[Node, Node, bool]]):
         super(Edge, self).__init__((u, v, directed))
 
     def __repr__(self):
-        return f"{repr(self.content[0])}{'->' if self.content[2] else '-'}{repr(self.content[1])}"
+        return f"Edge({str(self.content[0])}{'->' if self.content[2] else '-'}{str(self.content[1])})"
 
     def __str__(self):
-        return f"Edge({str(self.content[0])}{'->' if self.content[2] else '-'}{str(self.content[1])})"
+        return f"{repr(self.content[0])}{'->' if self.content[2] else '-'}{repr(self.content[1])}"
