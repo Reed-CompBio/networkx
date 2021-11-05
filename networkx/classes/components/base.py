@@ -23,11 +23,11 @@ class ContentWrapper(Hashable, Generic[_T]):
     def __init__(self, content: _T) -> None:
         if not isinstance(content, Hashable):
             raise TypeError(f"{content} is not Hashable.")
-        self._content = content
+        self._wrapped = content
 
     @property
     def content(self) -> _T:
-        return self._content
+        return self._wrapped
 
     # Hashable
     @_content_biop_function_caller
@@ -63,7 +63,7 @@ class ContentWrapper(Hashable, Generic[_T]):
         pass
 
     def __neg__(self):
-        return not self._content
+        return not self.content
 
     # stringify
     def __repr__(self):
