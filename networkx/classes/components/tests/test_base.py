@@ -1,7 +1,10 @@
-from typing import Type
+from typing import Type, Any, Callable, TypeVar
 
 from ..base import ContentWrapper, GRAPHERY_TYPE_FLAG_NAME
 import pytest
+
+
+_T = TypeVar("_T")
 
 
 class WrapperTestBase:
@@ -51,8 +54,40 @@ class WrapperTestBase:
         assert isinstance(wrapped, cls.wrapper_type) or (
             hasattr(wrapped, GRAPHERY_TYPE_FLAG_NAME)
             and getattr(wrapped, GRAPHERY_TYPE_FLAG_NAME, None)
-            == cls.wrapper_type._graphery_type_flag
+            == getattr(cls.wrapper_type, GRAPHERY_TYPE_FLAG_NAME)
         ), f"{wrapped} is not a {cls.wrapper_type.__name__} type"
+
+    def test_built_in_immutables(self, content):
+        wrapped = self.wrapper_type.wraps(content)
+        self._equal_test(wrapped, content)
+        self._hash_test(wrapped, content)
+        self._type_equal_test(wrapped, content)
+        self._test_property_equal(wrapped, content)
+
+    def test_user_defined_class(
+        self,
+        defined_cls: Type[_T] = None,
+        init_value: Any = None,
+        mod_fn: Callable[[_T, Any], None] = None,
+        mod_val: Any = None,
+    ):
+        assert defined_cls is not None
+        assert init_value is not None
+
+        content = defined_cls(init_value)
+        w = self.wrapper_type.wraps(content)
+        self._equal_test(w, content)
+        self._hash_test(w, content)
+        self._type_equal_test(w, content)
+        self._test_property_equal(w, content)
+
+        # change member attr
+        if mod_fn is not None and mod_val is not None:
+            mod_fn(content, mod_val)
+            self._equal_test(w, content)
+            self._hash_test(w, content)
+            self._type_equal_test(w, content)
+            self._test_property_equal(w, content)
 
 
 class TestContentWrapper(WrapperTestBase):
@@ -63,14 +98,10 @@ class TestContentWrapper(WrapperTestBase):
             pytest.param("str"),
         ],
     )
-    def test_built_in_immutables(self, content):
-        wrapped = ContentWrapper.wraps(content)
-        self._equal_test(wrapped, content)
-        self._hash_test(wrapped, content)
-        self._type_equal_test(wrapped, content)
-        self._test_property_equal(wrapped, content)
+    def test_built_in_immutables(self, content: Any):
+        super().test_built_in_immutables(content)
 
-    def test_user_defined_class(self):
+    def test_user_defined_class(self, **_):
         class A:
             def __init__(self, arg: int):
                 self.a = arg
@@ -82,17 +113,4 @@ class TestContentWrapper(WrapperTestBase):
             def mod_a(self) -> int:
                 return self.a * 10
 
-        a = A(7)
-        w = ContentWrapper.wraps(a)
-        self._equal_test(w, a)
-        self._hash_test(w, a)
-        self._type_equal_test(w, a)
-        self._test_property_equal(w, a)
-
-        # change member attr
-        a.change_arg(20)
-        assert a.a == 20
-        self._equal_test(w, a)
-        self._hash_test(w, a)
-        self._type_equal_test(w, a)
-        self._test_property_equal(w, a)
+        super(TestContentWrapper, self).test_user_defined_class(A, 10, A.change_arg, 20)
