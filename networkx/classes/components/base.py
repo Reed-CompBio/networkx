@@ -38,9 +38,6 @@ class ContentWrapper:
                 for k, v in content.__dict__.items():
                     obj.__dict__[k] = v
 
-            # init wrapped type
-            cls.__init__(obj)
-
             return obj
 
         return _wrapped_new
@@ -50,7 +47,7 @@ class ContentWrapper:
         # to replace __init__
         # noinspection PyUnusedLocal
         def _wrapped_init(wrapped_self, *args, **kw):
-            pass
+            cls.__init__(wrapped_self)
 
         return _wrapped_init
 
