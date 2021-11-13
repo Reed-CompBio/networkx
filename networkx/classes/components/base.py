@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Final, Dict, Type, Callable
+from typing import Any, Final, Dict, Type, Callable, TypeGuard
 
 GRAPHERY_TYPE_FLAG_NAME: Final[str] = "_graphery_type_flag"
 GRAPHERY_TYPES: Final[Dict] = {}
@@ -74,3 +74,17 @@ class ContentWrapper:
             content = new_wrapped_type(content)
 
         return content
+
+    @classmethod
+    def _is_wrapper_type(cls, c: Any) -> TypeGuard:
+        return (
+            isinstance(c, cls)
+            or getattr(c, GRAPHERY_TYPE_FLAG_NAME, None) == cls._graphery_type_flag
+        )
+
+    @classmethod
+    def is_content_wrapper(cls, c: Any) -> TypeGuard[ContentWrapper]:
+        return cls._is_wrapper_type(c)
+
+
+is_content_wrapper = ContentWrapper.is_content_wrapper
