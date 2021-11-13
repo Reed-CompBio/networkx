@@ -1,100 +1,50 @@
 from __future__ import annotations
 
-from typing import Tuple
+from typing import List, Sequence, TypeGuard, Any
 
 from .base import ContentWrapper
 from .node import Node
 
 
-class Edge(ContentWrapper[Tuple[Node, Node, bool, int | None]]):
+class Edge(tuple, ContentWrapper):
     """Edge wrapper for a networkx edge
 
     dilemma: does Edge act like a pure proxy or an edge?
     """
 
-    def __init__(self, u, v, directed: bool = False, key: int = None):
-        if not isinstance(u, Node):
-            u = Node(u)
-        if not isinstance(v, Node):
-            v = Node(v)
+    _graphery_type_flag = "Edge"
+    __init_key = hash(object())
 
-        if not isinstance(directed, bool):
-            raise ValueError("directed argument has to be bool")
+    def __new__(cls, seq: Sequence = (), init_key: int = 1):
+        return tuple.__new__(cls, seq)
 
-        if key is not None and not isinstance(key, int):
-            raise ValueError("key argument has to be None or an integer")
+    def __init__(self, _: Sequence = (), init_key: int = 1):
+        if init_key != self.__init_key:
+            raise ValueError("Create Edge instance only using wraps()")
 
-        super(Edge, self).__init__((u, v, directed, key))
+        ContentWrapper.__init__(self)
+        tuple.__init__(self)
 
-        self._edge = u, v
-        self._directed = directed
-        self._key = key
+        if not all(isinstance(e, Node) for e in self):
+            raise TypeError("Elements of an Edge have to be Node")
 
-    @property
-    def content(self) -> Tuple:
-        return self._edge
+    @classmethod
+    def wraps(cls, *content: List[Sequence]) -> Edge:
+        if len(content) == 1:
+            content = content[0]
+            if len(content) != 2:
+                raise ValueError("Edge only wraps length 2 sequence or two elements")
+        elif len(content) != 2:
+            raise ValueError("Edge only wraps length 2 sequence or two elements")
 
-    @property
-    def is_directed(self) -> bool:
-        return self._directed
+        u, v = content
+        u, v = Node.wraps(u), Node.wraps(v)
 
-    @property
-    def key(self) -> int | None:
-        return self._key
+        return cls((u, v), init_key=cls.__init_key)
 
-    def count(self, *args, **kwargs):
-        return self.content.count(*args, **kwargs)
+    @classmethod
+    def is_edge(cls, c: Any) -> TypeGuard[Edge]:
+        return cls._is_wrapper_type(c)
 
-    def index(self, *args, **kwargs):
-        return self.content.index(*args, **kwargs)
 
-    def __contains__(self, item) -> bool:
-        return item in self.content
-
-    def __eq__(self, item):
-        if isinstance(item, Edge):
-            return super().__eq__(item)
-        return self.content == item
-
-    def __getitem__(self, item):
-        return self.content[item]
-
-    def __getnewargs__(self, *args, **kwargs):
-        # TODO support pickle
-        raise NotImplementedError
-
-    def __ge__(self, item):
-        return self.content >= item
-
-    def __gt__(self, item):
-        return self.content > item
-
-    def __iter__(self):
-        return self.content.__iter__()
-
-    def __len__(self):
-        return len(self.content)
-
-    def __le__(self, item):
-        return self.content <= item
-
-    def __lt__(self, item):
-        return self.content < item
-
-    def __add__(self, other):
-        raise NotImplementedError
-
-    def __mul__(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def __ne__(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def __rmul__(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def __repr__(self):
-        return f"Edge({repr(self.content[0])}, {repr(self.content[1])}, {self.is_directed}, {self.key})"
-
-    def __str__(self):
-        return f"{str(self.content[0])} {'->' if self.is_directed else '-'} {str(self.content[1])}"
+is_edge = Edge.is_edge
