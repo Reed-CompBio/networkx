@@ -25,11 +25,14 @@ class WrapperTestBase:
             wrapped == original
         ), f"equal assertion failed for {wrapped} and {original}"
 
-    @staticmethod
-    def _type_equal_test(wrapped: ContentWrapper, original):
+    @classmethod
+    def _type_equal_test(cls, wrapped: ContentWrapper, original):
         assert isinstance(
             wrapped, original.__class__
         ), f"{wrapped} does not derive from {original}"
+        assert isinstance(wrapped, cls.wrapper_type) or cls._test_wrapper_type_flag(
+            wrapped
+        )
 
     @staticmethod
     def _test_property_equal(wrapped: ContentWrapper, original):
@@ -70,7 +73,6 @@ class WrapperTestBase:
         self._hash_test(wrapped, content)
         self._type_equal_test(wrapped, content)
         self._test_property_equal(wrapped, content)
-        self._test_wrapper_type_flag(wrapped)
         return wrapped
 
     def test_user_defined_class(
@@ -89,7 +91,6 @@ class WrapperTestBase:
         self._hash_test(wrapped, content)
         self._type_equal_test(wrapped, content)
         self._test_property_equal(wrapped, content)
-        self._test_wrapper_type_flag(wrapped)
 
         # change member attr
         if mod_fn is not None and mod_val is not None:
@@ -98,7 +99,6 @@ class WrapperTestBase:
             self._hash_test(wrapped, content)
             self._type_equal_test(wrapped, content)
             self._test_property_equal(wrapped, content)
-            self._test_wrapper_type_flag(wrapped)
         return wrapped
 
 
