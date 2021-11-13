@@ -1,8 +1,24 @@
 from __future__ import annotations
 
-from .base import ContentWrapper, collect_graphery_type
+from typing import Any, TypeGuard
+
+from .base import ContentWrapper, collect_graphery_type, GRAPHERY_TYPE_FLAG_NAME
 
 
 @collect_graphery_type
 class Node(ContentWrapper):
     _graphery_type_flag = "Node"
+
+    @classmethod
+    def wraps(cls, content: Any) -> Node:
+        if isinstance(content, cls):
+            return content
+
+        return super(Node, cls).wraps(content)
+
+    @classmethod
+    def is_node(cls, c: Any) -> TypeGuard[Node]:
+        return cls._is_wrapper_type(c)
+
+
+is_node = Node.is_node
