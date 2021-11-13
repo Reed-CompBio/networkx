@@ -1,87 +1,50 @@
 from __future__ import annotations
 
-from copy import deepcopy
-from typing import Hashable, Any, TypeVar, Generic, Callable
-from functools import wraps
+from typing import Any, Final, Dict
 
-_T = TypeVar("_T", covariant=True, bound=Hashable)
-
-
-def _content_biop_function_caller(fn: Callable) -> Callable:
-    @wraps(fn)
-    def _helper(self: ContentWrapper, other: ContentWrapper | Any):
-        cmp_fn = getattr(self.content, fn.__name__)
-        if isinstance(other, ContentWrapper):
-            return cmp_fn(other.content)
-        else:
-            return cmp_fn(other)
-
-    return _helper
+GRAPHERY_TYPE_FLAG_NAME: Final[str] = "_graphery_type_flag"
+GRAPHERY_TYPES: Final[Dict] = {}
 
 
-class ContentWrapper(Hashable, Generic[_T]):
-    def __init__(self, content: _T) -> None:
-        if not isinstance(content, Hashable):
-            raise TypeError(f"{content} is not Hashable.")
-        self._wrapped = content
+class ContentWrapper:
+    _graphery_type_flag = "WrapperBase"
 
-    @property
-    def content(self) -> _T:
-        return self._wrapped
+    def __init__(self) -> None:
+        self._graphery_type_flag: str = self._graphery_type_flag
+        GRAPHERY_TYPES[self._graphery_type_flag] = self.__class__
 
-    # Hashable
-    @_content_biop_function_caller
-    def __eq__(self, other: ContentWrapper | Any) -> bool:
-        pass
+    @classmethod
+    def wraps(cls, content: Any) -> ContentWrapper:
+        try:
+            setattr(content, GRAPHERY_TYPE_FLAG_NAME, cls._graphery_type_flag)
+        except AttributeError:
+            original_type = content.__class__
 
-    def __hash__(self) -> int:
-        return hash(self.content)
+            def _wrapped_new(wrapped_cls, *args, **kwargs):
+                try:
+                    obj = original_type.__new__(wrapped_cls, *args, **kwargs)
+                except TypeError:
+                    obj = original_type.__new__(wrapped_cls)
 
-    # comparing support
-    @_content_biop_function_caller
-    def __le__(self, other: ContentWrapper | Any) -> bool:
-        pass
+                # copy attr from old content
+                if hasattr(content, "__dict__"):
+                    for k, v in content.__dict__.items():
+                        obj.__dict__[k] = v
 
-    @_content_biop_function_caller
-    def __lt__(self, other: ContentWrapper | Any) -> bool:
-        pass
+                # init wrapped type
+                cls.__init__(obj)
 
-    @_content_biop_function_caller
-    def __ge__(self, other: ContentWrapper | Any) -> bool:
-        pass
+                return obj
 
-    @_content_biop_function_caller
-    def __gt__(self, other: ContentWrapper | Any) -> bool:
-        pass
+            # noinspection PyUnusedLocal
+            def _wrapped_init(*args, **kwargs):
+                pass
 
-    @_content_biop_function_caller
-    def __eq__(self, other: ContentWrapper | Any) -> bool:
-        pass
+            new_wrapped_type = type(
+                f"G_{original_type.__name__}",
+                (original_type, cls),
+                {"__new__": _wrapped_new, "__init__": _wrapped_init},
+            )
+            content = new_wrapped_type(content)
 
-    @_content_biop_function_caller
-    def __ne__(self, other: ContentWrapper | Any) -> bool:
-        pass
-
-    def __neg__(self):
-        return not self.content
-
-    # stringify
-    def __repr__(self):
-        return f"{self.__class__.__name__}({repr(self.content)})"
-
-    def __str__(self):
-        return str(self.content)
-
-    def __copy__(self):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        result.__dict__.update(self.__dict__)
-        return result
-
-    def __deepcopy__(self, memo):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, deepcopy(v, memo=memo))
-        return result
+        return content
