@@ -64,13 +64,14 @@ class WrapperTestBase:
             getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME) == cls.wrapper_type_flag
         ), f"{wrapper}'s flag is {getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME)} instead of {cls.wrapper_type_flag}"
 
-    def test_built_in_immutables(self, content):
+    def test_built_in_immutables(self, content) -> wrapper_type:
         wrapped = self.wrapper_type.wraps(content)
         self._equal_test(wrapped, content)
         self._hash_test(wrapped, content)
         self._type_equal_test(wrapped, content)
         self._test_property_equal(wrapped, content)
         self._test_wrapper_type_flag(wrapped)
+        return wrapped
 
     def test_user_defined_class(
         self,
@@ -78,26 +79,27 @@ class WrapperTestBase:
         init_value: Any = None,
         mod_fn: Callable[[_T, Any], None] = None,
         mod_val: Any = None,
-    ):
+    ) -> wrapper_type:
         assert defined_cls is not None
         assert init_value is not None
 
         content = defined_cls(init_value)
-        w = self.wrapper_type.wraps(content)
-        self._equal_test(w, content)
-        self._hash_test(w, content)
-        self._type_equal_test(w, content)
-        self._test_property_equal(w, content)
-        self._test_wrapper_type_flag(w)
+        wrapped = self.wrapper_type.wraps(content)
+        self._equal_test(wrapped, content)
+        self._hash_test(wrapped, content)
+        self._type_equal_test(wrapped, content)
+        self._test_property_equal(wrapped, content)
+        self._test_wrapper_type_flag(wrapped)
 
         # change member attr
         if mod_fn is not None and mod_val is not None:
             mod_fn(content, mod_val)
-            self._equal_test(w, content)
-            self._hash_test(w, content)
-            self._type_equal_test(w, content)
-            self._test_property_equal(w, content)
-            self._test_wrapper_type_flag(w)
+            self._equal_test(wrapped, content)
+            self._hash_test(wrapped, content)
+            self._type_equal_test(wrapped, content)
+            self._test_property_equal(wrapped, content)
+            self._test_wrapper_type_flag(wrapped)
+        return wrapped
 
 
 class TestContentWrapper(WrapperTestBase):
