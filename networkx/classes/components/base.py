@@ -16,7 +16,7 @@ class ContentWrapper:
     _graphery_type_flag = "WrapperBase"
 
     def __init__(self) -> None:
-        self._graphery_type_flag: str = self._graphery_type_flag
+        self._graphery_type_flag: Final[str] = self._graphery_type_flag
 
     @property
     def graphery_type_flag(self) -> str:
