@@ -77,7 +77,7 @@ class WrapperTestBase:
 
     def test_user_defined_class(
         self,
-        defined_cls: Type[_T] = None,
+        defined_cls: Callable[..., _T] = None,
         init_value: Any = None,
         mod_fn: Callable[[_T, Any], None] = None,
         mod_val: Any = None,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..node import Node
 from .test_base import WrapperTestBase
 import pytest
