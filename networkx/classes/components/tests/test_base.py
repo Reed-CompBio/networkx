@@ -9,6 +9,7 @@ _T = TypeVar("_T")
 
 class WrapperTestBase:
     wrapper_type: Type[ContentWrapper] = ContentWrapper
+    wrapper_type_flag = "WrapperBase"
 
     @staticmethod
     def _hash_test(wrapped: ContentWrapper, original):
@@ -57,12 +58,19 @@ class WrapperTestBase:
             == getattr(cls.wrapper_type, GRAPHERY_TYPE_FLAG_NAME)
         ), f"{wrapped} is not a {cls.wrapper_type.__name__} type"
 
+    @classmethod
+    def _test_wrapper_type_flag(cls, wrapper: ContentWrapper):
+        assert (
+            getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME) == cls.wrapper_type_flag
+        ), f"{wrapper}'s flag is {getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME)} instead of {cls.wrapper_type_flag}"
+
     def test_built_in_immutables(self, content):
         wrapped = self.wrapper_type.wraps(content)
         self._equal_test(wrapped, content)
         self._hash_test(wrapped, content)
         self._type_equal_test(wrapped, content)
         self._test_property_equal(wrapped, content)
+        self._test_wrapper_type_flag(wrapped)
 
     def test_user_defined_class(
         self,
@@ -80,6 +88,7 @@ class WrapperTestBase:
         self._hash_test(w, content)
         self._type_equal_test(w, content)
         self._test_property_equal(w, content)
+        self._test_wrapper_type_flag(w)
 
         # change member attr
         if mod_fn is not None and mod_val is not None:
@@ -88,6 +97,7 @@ class WrapperTestBase:
             self._hash_test(w, content)
             self._type_equal_test(w, content)
             self._test_property_equal(w, content)
+            self._test_wrapper_type_flag(w)
 
 
 class TestContentWrapper(WrapperTestBase):
