@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import List, Sequence, TypeGuard, Any
+from typing import Sequence, TypeGuard, Any
 
 from .base import ContentWrapper
-from .node import Node
+from .node import Node, is_node
 
 
 class Edge(tuple, ContentWrapper):
@@ -25,11 +25,11 @@ class Edge(tuple, ContentWrapper):
         ContentWrapper.__init__(self)
         tuple.__init__(self)
 
-        if not all(isinstance(e, Node) for e in self):
+        if not all(is_node(e) for e in self):
             raise TypeError("Elements of an Edge have to be Node")
 
     @classmethod
-    def wraps(cls, *content: List[Sequence]) -> Edge:
+    def wraps(cls, *content) -> Edge:
         if len(content) == 1:
             content = content[0]
             if len(content) != 2:
