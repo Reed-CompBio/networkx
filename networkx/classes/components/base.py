@@ -62,6 +62,9 @@ class ContentWrapper:
         if content is None:
             raise TypeError(f"{cls.__name__} cannot wrap None")
 
+        if cls._is_wrapper_type(content):
+            return content
+
         try:
             setattr(content, GRAPHERY_TYPE_FLAG_NAME, cls._graphery_type_flag)
         except AttributeError:

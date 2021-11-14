@@ -37,6 +37,8 @@ class Edge(tuple, ContentWrapper):
             content = content[0]
             if len(content) != 2:
                 raise ValueError("Edge only wraps length 2 sequence or two elements")
+            if cls.is_edge(content):
+                return content
         elif len(content) != 2:
             raise ValueError("Edge only wraps length 2 sequence or two elements")
 
@@ -44,6 +46,10 @@ class Edge(tuple, ContentWrapper):
         u, v = Node.wraps(u), Node.wraps(v)
 
         return cls((u, v), init_key=cls.__init_key)
+
+    @classmethod
+    def _is_wrapper_type(cls, c: Any) -> TypeGuard:
+        return isinstance(c, cls)
 
     @classmethod
     def is_edge(cls, c: Any) -> TypeGuard[Edge]:

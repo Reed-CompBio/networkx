@@ -11,13 +11,6 @@ class Node(ContentWrapper):
     _wrapped_type_prefix = "N"
 
     @classmethod
-    def wraps(cls, content: Any) -> Node:
-        if cls.is_node(content):
-            return content
-
-        return super(Node, cls).wraps(content)
-
-    @classmethod
     def is_node(cls, c: Any) -> TypeGuard[Node]:
         return cls._is_wrapper_type(c)
 
