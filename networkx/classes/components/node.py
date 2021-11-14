@@ -8,6 +8,7 @@ from .base import ContentWrapper, collect_graphery_type, GRAPHERY_TYPE_FLAG_NAME
 @collect_graphery_type
 class Node(ContentWrapper):
     _graphery_type_flag = "Node"
+    _wrapped_type_prefix = "N"
 
     @classmethod
     def wraps(cls, content: Any) -> Node:

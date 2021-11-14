@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import Sequence, TypeGuard, Any
 
-from .base import ContentWrapper
+from .base import ContentWrapper, collect_graphery_type
 from .node import Node, is_node
 
 
+@collect_graphery_type
 class Edge(tuple, ContentWrapper):
     """Edge wrapper for a networkx edge
 
@@ -13,6 +14,8 @@ class Edge(tuple, ContentWrapper):
     """
 
     _graphery_type_flag = "Edge"
+    _wrapped_type_prefix = "E"
+
     __init_key = hash(object())
 
     def __new__(cls, seq: Sequence = (), init_key: int = 1):
