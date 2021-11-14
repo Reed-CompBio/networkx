@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Final, Dict, Type, Callable, TypeGuard
+from typing import Any, Final, Dict, Type, Callable, TypeGuard, Optional
 
 GRAPHERY_TYPE_FLAG_NAME: Final[str] = "_graphery_type_flag"
 GRAPHERY_TYPES: Final[Dict] = {}
@@ -11,13 +11,36 @@ def collect_graphery_type(cls: Type[ContentWrapper]) -> Type[ContentWrapper]:
     return cls
 
 
+_generated_type_cache = {}
+
+
+def _pickle_resolver(cls: Type) -> Type:
+    return _generated_type_cache[cls]
+
+
+def _set_new_wrapper_type(o_cls, w_cls) -> None:
+    _generated_type_cache[o_cls] = w_cls
+
+
+def _get_new_wrapper_type(o_cls) -> Optional[Type]:
+    return _generated_type_cache.get(o_cls, None)
+
+
 @collect_graphery_type
 class ContentWrapper:
     _graphery_type_flag = "WrapperBase"
     _wrapped_types: Final[Dict] = {}
+    _wrapped_type_prefix: Final[str] = "CW"
 
     def __init__(self) -> None:
         self._graphery_type_flag: Final[str] = self._graphery_type_flag
+
+    def __getstate__(self):
+        return self.__dict__
+
+    def __setstate__(self, state):
+        for k, v in state.items():
+            setattr(self, k, v)
 
     @property
     def graphery_type_flag(self) -> str:
@@ -69,20 +92,23 @@ class ContentWrapper:
                 )
                 _wrapped_init = cls._get_wrapped_init()
 
+                class_name = f"{cls._wrapped_type_prefix}_{original_type.__name__}"
+
                 new_wrapped_type = type(
-                    f"G_{original_type.__name__}",
+                    class_name,
                     (cls, original_type),
                     {
                         "__new__": _wrapped_new,
                         "__init__": _wrapped_init,
                         "__reduce__": lambda s: (
-                            lambda c: c,
-                            (s.__class__,),
+                            _pickle_resolver,
+                            (original_type,),
                             s.__dict__,
                         ),
                     },
                 )
                 cls._wrapped_types[original_type] = new_wrapped_type
+                _set_new_wrapper_type(original_type, new_wrapped_type)
             content = new_wrapped_type(content)
 
         return content
