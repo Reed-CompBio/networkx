@@ -10,6 +10,7 @@ For directed graphs see DiGraph and MultiDiGraph.
 from copy import deepcopy
 
 import networkx as nx
+from networkx.classes.components import Node
 from networkx.classes.coreviews import AdjacencyView
 from networkx.classes.reportviews import NodeView, EdgeView, DegreeView
 from networkx.exception import NetworkXError
@@ -517,6 +518,7 @@ class Graph:
         if node_for_adding not in self._node:
             if node_for_adding is None:
                 raise ValueError("None cannot be a node")
+            node_for_adding = Node.wraps(node_for_adding)
             self._adj[node_for_adding] = self.adjlist_inner_dict_factory()
             attr_dict = self._node[node_for_adding] = self.node_attr_dict_factory()
             attr_dict.update(attr)
@@ -579,6 +581,7 @@ class Graph:
             if newnode:
                 if n is None:
                     raise ValueError("None cannot be a node")
+                n = Node.wraps(n)
                 self._adj[n] = self.adjlist_inner_dict_factory()
                 self._node[n] = self.node_attr_dict_factory()
             self._node[n].update(newdict)
@@ -879,11 +882,13 @@ class Graph:
         if u not in self._node:
             if u is None:
                 raise ValueError("None cannot be a node")
+            u = Node.wraps(u)
             self._adj[u] = self.adjlist_inner_dict_factory()
             self._node[u] = self.node_attr_dict_factory()
         if v not in self._node:
             if v is None:
                 raise ValueError("None cannot be a node")
+            v = Node.wraps(v)
             self._adj[v] = self.adjlist_inner_dict_factory()
             self._node[v] = self.node_attr_dict_factory()
         # add the edge
@@ -942,11 +947,13 @@ class Graph:
             if u not in self._node:
                 if u is None:
                     raise ValueError("None cannot be a node")
+                u = Node.wraps(u)
                 self._adj[u] = self.adjlist_inner_dict_factory()
                 self._node[u] = self.node_attr_dict_factory()
             if v not in self._node:
                 if v is None:
                     raise ValueError("None cannot be a node")
+                v = Node.wraps(v)
                 self._adj[v] = self.adjlist_inner_dict_factory()
                 self._node[v] = self.node_attr_dict_factory()
             datadict = self._adj[u].get(v, self.edge_attr_dict_factory())

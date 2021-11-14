@@ -2,6 +2,7 @@
 from copy import deepcopy
 
 import networkx as nx
+from networkx.classes.components import Node
 from networkx.classes.digraph import DiGraph
 from networkx.classes.multigraph import MultiGraph
 from networkx.classes.coreviews import MultiAdjacencyView
@@ -466,12 +467,14 @@ class MultiDiGraph(MultiGraph, DiGraph):
         if u not in self._succ:
             if u is None:
                 raise ValueError("None cannot be a node")
+            u = Node.wraps(u)
             self._succ[u] = self.adjlist_inner_dict_factory()
             self._pred[u] = self.adjlist_inner_dict_factory()
             self._node[u] = self.node_attr_dict_factory()
         if v not in self._succ:
             if v is None:
                 raise ValueError("None cannot be a node")
+            v = Node.wraps(v)
             self._succ[v] = self.adjlist_inner_dict_factory()
             self._pred[v] = self.adjlist_inner_dict_factory()
             self._node[v] = self.node_attr_dict_factory()

@@ -2,6 +2,7 @@
 from copy import deepcopy
 
 import networkx as nx
+from networkx.classes.components import Node
 from networkx.classes.graph import Graph
 from networkx.classes.coreviews import AdjacencyView
 from networkx.classes.reportviews import (
@@ -418,6 +419,7 @@ class DiGraph(Graph):
         if node_for_adding not in self._succ:
             if node_for_adding is None:
                 raise ValueError("None cannot be a node")
+            node_for_adding = Node.wraps(node_for_adding)
             self._succ[node_for_adding] = self.adjlist_inner_dict_factory()
             self._pred[node_for_adding] = self.adjlist_inner_dict_factory()
             attr_dict = self._node[node_for_adding] = self.node_attr_dict_factory()
@@ -481,6 +483,7 @@ class DiGraph(Graph):
             if newnode:
                 if n is None:
                     raise ValueError("None cannot be a node")
+                n = Node.wraps(n)
                 self._succ[n] = self.adjlist_inner_dict_factory()
                 self._pred[n] = self.adjlist_inner_dict_factory()
                 self._node[n] = self.node_attr_dict_factory()
@@ -620,12 +623,14 @@ class DiGraph(Graph):
         if u not in self._succ:
             if u is None:
                 raise ValueError("None cannot be a node")
+            u = Node.wraps(u)
             self._succ[u] = self.adjlist_inner_dict_factory()
             self._pred[u] = self.adjlist_inner_dict_factory()
             self._node[u] = self.node_attr_dict_factory()
         if v not in self._succ:
             if v is None:
                 raise ValueError("None cannot be a node")
+            v = Node.wraps(v)
             self._succ[v] = self.adjlist_inner_dict_factory()
             self._pred[v] = self.adjlist_inner_dict_factory()
             self._node[v] = self.node_attr_dict_factory()
@@ -685,12 +690,14 @@ class DiGraph(Graph):
             if u not in self._succ:
                 if u is None:
                     raise ValueError("None cannot be a node")
+                u = Node.wraps(u)
                 self._succ[u] = self.adjlist_inner_dict_factory()
                 self._pred[u] = self.adjlist_inner_dict_factory()
                 self._node[u] = self.node_attr_dict_factory()
             if v not in self._succ:
                 if v is None:
                     raise ValueError("None cannot be a node")
+                v = Node.wraps(v)
                 self._succ[v] = self.adjlist_inner_dict_factory()
                 self._pred[v] = self.adjlist_inner_dict_factory()
                 self._node[v] = self.node_attr_dict_factory()
