@@ -71,8 +71,16 @@ class ContentWrapper:
 
                 new_wrapped_type = type(
                     f"G_{original_type.__name__}",
-                    (original_type, cls),
-                    {"__new__": _wrapped_new, "__init__": _wrapped_init},
+                    (cls, original_type),
+                    {
+                        "__new__": _wrapped_new,
+                        "__init__": _wrapped_init,
+                        "__reduce__": lambda s: (
+                            lambda c: c,
+                            (s.__class__,),
+                            s.__dict__,
+                        ),
+                    },
                 )
                 cls._wrapped_types[original_type] = new_wrapped_type
             content = new_wrapped_type(content)
