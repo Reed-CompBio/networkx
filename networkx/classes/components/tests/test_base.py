@@ -1,6 +1,6 @@
 from typing import Type, Any, Callable, TypeVar
 
-from ..base import ContentWrapper, GRAPHERY_TYPE_FLAG_NAME
+from ..base import ContentWrapper, GRAPHERY_TYPE_FLAG_NAME, GRAPHERY_TYPES
 import pickle
 import pytest
 
@@ -88,6 +88,12 @@ class WrapperTestBase:
             assert (
                 getattr(wrapped, k) == v
             ), f"key {k} in pickled obj does not match the original one"
+
+    def test_type_collection(self):
+        assert (
+            self.wrapper_type
+            == GRAPHERY_TYPES[getattr(self.wrapper_type, GRAPHERY_TYPE_FLAG_NAME)]
+        )
 
     def test_built_in_immutables(self, content) -> wrapper_type:
         wrapped = self.wrapper_type.wraps(content)

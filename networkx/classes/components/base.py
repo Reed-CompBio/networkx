@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Final, Dict, Type, Callable, TypeGuard
 
 GRAPHERY_TYPE_FLAG_NAME: Final[str] = "_graphery_type_flag"
-GRAPHERY_TYPES: Final[Dict] = {}
+GRAPHERY_TYPES: Final[Dict[str, Type[ContentWrapper]]] = {}
 
 
 def collect_graphery_type(cls: Type[ContentWrapper]) -> Type[ContentWrapper]:
