@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Final, Dict, Type, Callable, TypeGuard, Optional
+from typing import Any, Final, Dict, Type, Callable, TypeGuard
 
 GRAPHERY_TYPE_FLAG_NAME: Final[str] = "_graphery_type_flag"
 GRAPHERY_TYPES: Final[Dict] = {}
@@ -9,21 +9,6 @@ GRAPHERY_TYPES: Final[Dict] = {}
 def collect_graphery_type(cls: Type[ContentWrapper]) -> Type[ContentWrapper]:
     GRAPHERY_TYPES[getattr(cls, GRAPHERY_TYPE_FLAG_NAME)] = cls
     return cls
-
-
-_generated_type_cache = {}
-
-
-def _pickle_resolver(cls: Type) -> Type:
-    return _generated_type_cache[cls]
-
-
-def _set_new_wrapper_type(o_cls, w_cls) -> None:
-    _generated_type_cache[o_cls] = w_cls
-
-
-def _get_new_wrapper_type(o_cls) -> Optional[Type]:
-    return _generated_type_cache.get(o_cls, None)
 
 
 @collect_graphery_type
@@ -37,10 +22,6 @@ class ContentWrapper:
 
     def __getstate__(self):
         return self.__dict__
-
-    def __setstate__(self, state):
-        for k, v in state.items():
-            setattr(self, k, v)
 
     @property
     def graphery_type_flag(self) -> str:
@@ -100,15 +81,14 @@ class ContentWrapper:
                     {
                         "__new__": _wrapped_new,
                         "__init__": _wrapped_init,
-                        "__reduce__": lambda s: (
-                            _pickle_resolver,
-                            (original_type,),
-                            s.__dict__,
-                        ),
                     },
                 )
                 cls._wrapped_types[original_type] = new_wrapped_type
-                _set_new_wrapper_type(original_type, new_wrapped_type)
+
+                from sys import modules
+
+                new_wrapped_type.__module__ = cls.__module__
+                setattr(modules[cls.__module__], class_name, new_wrapped_type)
             content = new_wrapped_type(content)
 
         return content
