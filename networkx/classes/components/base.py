@@ -20,12 +20,13 @@ class ContentWrapper:
     def __init__(self) -> None:
         self._graphery_type_flag: Final[str] = self._graphery_type_flag
 
-    def __getstate__(self):
-        return self.__dict__
-
     @property
     def graphery_type_flag(self) -> str:
         return self._graphery_type_flag
+
+    @classmethod
+    def _generate_class_name(cls, original_type: Type) -> str:
+        return f"_{cls._wrapped_type_prefix}_{original_type.__name__}"
 
     @classmethod
     def _get_wrapped_new(cls, **kwargs) -> Callable:
@@ -73,7 +74,7 @@ class ContentWrapper:
                 )
                 _wrapped_init = cls._get_wrapped_init()
 
-                class_name = f"{cls._wrapped_type_prefix}_{original_type.__name__}"
+                class_name = cls._generate_class_name(original_type)
 
                 new_wrapped_type = type(
                     class_name,
