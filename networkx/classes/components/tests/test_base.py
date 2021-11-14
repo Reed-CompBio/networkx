@@ -73,7 +73,12 @@ class WrapperTestBase:
         # only works in dumping
         # probably bugs in python, __setstate__ not working properly
         d = pickle.dumps(wrapped)
-        pickle.loads(d)
+        s = pickle.loads(d)
+        t = type(s)
+        for k, v in s.__dict__.items():
+            assert (
+                getattr(wrapped, k) == v
+            ), f"key {k} in pickled obj does not match the original one"
 
     def test_built_in_immutables(self, content) -> wrapper_type:
         wrapped = self.wrapper_type.wraps(content)
