@@ -14,6 +14,7 @@ def collect_graphery_type(cls: Type[ContentWrapper]) -> Type[ContentWrapper]:
 @collect_graphery_type
 class ContentWrapper:
     _graphery_type_flag = "WrapperBase"
+    _wrapped_types: Final[Dict] = {}
 
     def __init__(self) -> None:
         self._graphery_type_flag: Final[str] = self._graphery_type_flag
@@ -60,17 +61,20 @@ class ContentWrapper:
             setattr(content, GRAPHERY_TYPE_FLAG_NAME, cls._graphery_type_flag)
         except AttributeError:
             original_type = content.__class__
+            new_wrapped_type = cls._wrapped_types.get(original_type, None)
 
-            _wrapped_new = cls._get_wrapped_new(
-                original=content, original_type=original_type
-            )
-            _wrapped_init = cls._get_wrapped_init()
+            if new_wrapped_type is None:
+                _wrapped_new = cls._get_wrapped_new(
+                    original=content, original_type=original_type
+                )
+                _wrapped_init = cls._get_wrapped_init()
 
-            new_wrapped_type = type(
-                f"G_{original_type.__name__}",
-                (original_type, cls),
-                {"__new__": _wrapped_new, "__init__": _wrapped_init},
-            )
+                new_wrapped_type = type(
+                    f"G_{original_type.__name__}",
+                    (original_type, cls),
+                    {"__new__": _wrapped_new, "__init__": _wrapped_init},
+                )
+                cls._wrapped_types[original_type] = new_wrapped_type
             content = new_wrapped_type(content)
 
         return content
