@@ -49,6 +49,10 @@ class Edge(tuple, ContentWrapper):
         return cls((u, v), init_key=cls.__init_key)
 
     @classmethod
+    def _generate_class_name(cls, _) -> str:
+        return cls.__name__
+
+    @classmethod
     def _is_wrapper_type(cls, c: Any) -> TypeGuard:
         return isinstance(c, cls)
 

@@ -68,6 +68,15 @@ class WrapperTestBase:
             getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME) == cls.wrapper_type_flag
         ), f"{wrapper}'s flag is {getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME)} instead of {cls.wrapper_type_flag}"
 
+    @classmethod
+    def _test_new_wrapper_type_name(cls, wrapper: ContentWrapper, original: Any):
+        if isinstance(wrapper, cls.wrapper_type):
+            gn = wrapper.__class__.__name__
+            sn = cls.wrapper_type._generate_class_name(original.__class__)
+            assert (
+                gn == sn
+            ), f"generated class name {gn} does not match intended one {sn}"
+
     @staticmethod
     def _test_pickle(wrapped: ContentWrapper):
         # only works in dumping
@@ -87,6 +96,7 @@ class WrapperTestBase:
         self._type_equal_test(wrapped, content)
         self._test_property_equal(wrapped, content)
         self._test_pickle(wrapped)
+        self._test_new_wrapper_type_name(wrapped, content)
         return wrapped
 
     def test_user_defined_class(
