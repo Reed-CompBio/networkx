@@ -11,7 +11,7 @@ class Node(ContentWrapper):
 
     @classmethod
     def wraps(cls, content: Any) -> Node:
-        if isinstance(content, cls):
+        if cls.is_node(content):
             return content
 
         return super(Node, cls).wraps(content)
