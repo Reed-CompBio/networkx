@@ -1,6 +1,7 @@
 from typing import Type, Any, Callable, TypeVar
 
 from ..base import ContentWrapper, GRAPHERY_TYPE_FLAG_NAME
+import pickle
 import pytest
 
 
@@ -67,12 +68,20 @@ class WrapperTestBase:
             getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME) == cls.wrapper_type_flag
         ), f"{wrapper}'s flag is {getattr(wrapper, GRAPHERY_TYPE_FLAG_NAME)} instead of {cls.wrapper_type_flag}"
 
+    @staticmethod
+    def _test_pickle(wrapped: ContentWrapper):
+        # only works in dumping
+        # probably bugs in python, __setstate__ not working properly
+        d = pickle.dumps(wrapped)
+        pickle.loads(d)
+
     def test_built_in_immutables(self, content) -> wrapper_type:
         wrapped = self.wrapper_type.wraps(content)
         self._equal_test(wrapped, content)
         self._hash_test(wrapped, content)
         self._type_equal_test(wrapped, content)
         self._test_property_equal(wrapped, content)
+        self._test_pickle(wrapped)
         return wrapped
 
     def test_user_defined_class(
