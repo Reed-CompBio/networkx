@@ -30,9 +30,9 @@ class WrapperTestBase:
         assert isinstance(
             wrapped, original.__class__
         ), f"{wrapped} does not derive from {original}"
-        assert isinstance(wrapped, cls.wrapper_type) or cls._test_wrapper_type_flag(
+        assert cls.wrapper_type._is_wrapper_type(
             wrapped
-        )
+        ), f"{wrapped} is not an type of {cls.wrapper_type}"
 
     @staticmethod
     def _test_property_equal(wrapped: ContentWrapper, original):
