@@ -14,7 +14,7 @@ def collect_graphery_type(cls: Type[ContentWrapper]) -> Type[ContentWrapper]:
 @collect_graphery_type
 class ContentWrapper:
     _graphery_type_flag: str = "WrapperBase"
-    _wrapped_types: Final[Dict] = {}
+    _wrapped_types: Dict = {}
     _wrapped_type_prefix: str = "CW"
 
     def __init__(self) -> None:

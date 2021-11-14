@@ -14,6 +14,7 @@ class Edge(tuple, ContentWrapper):
     """
 
     _graphery_type_flag = "Edge"
+    _wrapped_types = None
     _wrapped_type_prefix = "E"
 
     __init_key = hash(object())
