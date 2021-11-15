@@ -1012,7 +1012,7 @@ class OutEdgeView(Set, Mapping):
     def __iter__(self):
         for n, nbrs in self._nodes_nbrs():
             for nbr in nbrs:
-                yield (n, nbr)
+                yield nx.Edge.wraps(n, nbr)
 
     def __contains__(self, e):
         try:
@@ -1134,7 +1134,7 @@ class EdgeView(OutEdgeView):
         for n, nbrs in self._nodes_nbrs():
             for nbr in list(nbrs):
                 if nbr not in seen:
-                    yield (n, nbr)
+                    yield nx.Edge.wraps(n, nbr)
             seen[n] = 1
         del seen
 
@@ -1166,7 +1166,7 @@ class InEdgeView(OutEdgeView):
     def __iter__(self):
         for n, nbrs in self._nodes_nbrs():
             for nbr in nbrs:
-                yield (nbr, n)
+                yield nx.Edge.wraps(nbr, n)
 
     def __contains__(self, e):
         try:
