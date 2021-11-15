@@ -1253,7 +1253,7 @@ class MultiEdgeView(OutMultiEdgeView):
             for nbr, kd in nbrs.items():
                 if nbr not in seen:
                     for k, dd in kd.items():
-                        yield (n, nbr, k)
+                        yield nx.MultiEdge.wraps(n, nbr, k)
             seen[n] = 1
         del seen
 
@@ -1279,7 +1279,7 @@ class InMultiEdgeView(OutMultiEdgeView):
         for n, nbrs in self._nodes_nbrs():
             for nbr, kdict in nbrs.items():
                 for key in kdict:
-                    yield (nbr, n, key)
+                    yield nx.MultiEdge.wraps(nbr, n, key)
 
     def __contains__(self, e):
         N = len(e)
