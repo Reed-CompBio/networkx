@@ -40,10 +40,13 @@ class ContentWrapper:
                 obj = original_type.__new__(wrapped_cls)
 
             # copy attr from old content
+            # this will certainly not happen cause
+            # when __dict__ is present, we can assign
             if hasattr(content, "__dict__"):
                 for k, v in content.__dict__.items():
                     obj.__dict__[k] = v
 
+            # copy attr from slot in case there is no dict
             if hasattr(content, "__slots__"):
                 for k in content.__slots__:
                     setattr(
