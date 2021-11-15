@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from ..node import Node
-from .test_base import WrapperTestBase
+from .test_base import WrapperTestBase, B, A
 import pytest
 
 
@@ -17,16 +17,9 @@ class TestNode(WrapperTestBase):
         with pytest.raises(TypeError):
             Node.wraps(None)
 
-    def test_user_defined_class(self, **_):
-        class A:
-            def __init__(self, arg: int):
-                self.a = arg
+    def test_user_defined_mutable_class(self, **_):
+        super(TestNode, self).test_user_defined_mutable_class(A, 10, A.change_arg, 20)
 
-            def change_arg(self, arg: int):
-                self.a = arg
-
-            @property
-            def mod_a(self) -> int:
-                return self.a * 10
-
-        super(TestNode, self).test_user_defined_class(A, 10, A.change_arg, 20)
+    def test_user_defined_immutable_class(self, **_):
+        super(TestNode, self).test_user_defined_immutable_class(B, (10,))
+        super(TestNode, self).test_user_defined_immutable_class(object, ())

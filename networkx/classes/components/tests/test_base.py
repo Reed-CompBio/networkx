@@ -1,4 +1,4 @@
-from typing import Type, Any, Callable, TypeVar
+from typing import Type, Any, Callable, TypeVar, Iterable
 
 from ..base import ContentWrapper, GRAPHERY_TYPE_FLAG_NAME, GRAPHERY_TYPES
 import pickle
@@ -6,6 +6,25 @@ import pytest
 
 
 _T = TypeVar("_T")
+
+
+class B:
+    __slots__ = ["a"]
+
+    def __init__(self, arg):
+        self.a = arg
+
+
+class A:
+    def __init__(self, arg: int):
+        self.a = arg
+
+    def change_arg(self, arg: int):
+        self.a = arg
+
+    @property
+    def mod_a(self) -> int:
+        return self.a * 10
 
 
 class WrapperTestBase:
@@ -105,7 +124,7 @@ class WrapperTestBase:
         self._test_new_wrapper_type_name(wrapped, content)
         return wrapped
 
-    def test_user_defined_class(
+    def test_user_defined_mutable_class(
         self,
         defined_cls: Callable[..., _T] = None,
         init_value: Any = None,
@@ -131,6 +150,19 @@ class WrapperTestBase:
             self._test_property_equal(wrapped, content)
         return wrapped
 
+    def test_user_defined_immutable_class(
+        self, defined_cls: Callable[..., _T] = None, init_value: Iterable = None
+    ):
+        assert defined_cls is not None
+        assert init_value is not None
+
+        content = defined_cls(*init_value)
+        wrapped = self.wrapper_type.wraps(content)
+        self._equal_test(wrapped, content)
+        self._hash_test(wrapped, content)
+        self._type_equal_test(wrapped, content)
+        self._test_property_equal(wrapped, content)
+
 
 class TestContentWrapper(WrapperTestBase):
     @pytest.mark.parametrize(
@@ -143,16 +175,11 @@ class TestContentWrapper(WrapperTestBase):
     def test_built_in_immutables(self, content: Any):
         super().test_built_in_immutables(content)
 
-    def test_user_defined_class(self, **_):
-        class A:
-            def __init__(self, arg: int):
-                self.a = arg
+    def test_user_defined_mutable_class(self, **_):
+        super(TestContentWrapper, self).test_user_defined_mutable_class(
+            A, 10, A.change_arg, 20
+        )
 
-            def change_arg(self, arg: int):
-                self.a = arg
-
-            @property
-            def mod_a(self) -> int:
-                return self.a * 10
-
-        super(TestContentWrapper, self).test_user_defined_class(A, 10, A.change_arg, 20)
+    def test_user_defined_immutable_class(self, **_):
+        super(TestContentWrapper, self).test_user_defined_immutable_class(B, (10,))
+        super(TestContentWrapper, self).test_user_defined_immutable_class(object, ())
