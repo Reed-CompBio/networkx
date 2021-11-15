@@ -44,6 +44,17 @@ class ContentWrapper:
                 for k, v in content.__dict__.items():
                     obj.__dict__[k] = v
 
+            if hasattr(content, "__slots__"):
+                for k in content.__slots__:
+                    setattr(
+                        obj.__class__,
+                        k,
+                        property(
+                            lambda s: getattr(s._ref, k),
+                            lambda s, i: setattr(s._ref, k, i),
+                        ),
+                    )
+
             return obj
 
         return _wrapped_new
