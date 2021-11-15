@@ -78,7 +78,7 @@ class MultiEdge(Edge):
         ContentWrapper.__init__(self)
         tuple.__init__(self)
 
-        if not all(is_node(e) for e in self):
+        if not all(is_node(e) for e in self[:2]):
             raise TypeError("Elements of an Edge have to be Node")
 
     @classmethod
