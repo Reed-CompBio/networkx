@@ -52,10 +52,25 @@ class ContentWrapper:
     def _get_wrapped_init(cls, **_) -> Callable:
         # to replace __init__
         # noinspection PyUnusedLocal
-        def _wrapped_init(wrapped_self, *args, **kw):
+        def _wrapped_init(wrapped_self, original, *args, **kw):
             cls.__init__(wrapped_self)
+            wrapped_self._ref = original
 
         return _wrapped_init
+
+    @classmethod
+    def _get_wrapped_hash(cls, **_) -> Callable:
+        def _wrapped_hash(wrapped_self) -> int:
+            return hash(wrapped_self._ref)
+
+        return _wrapped_hash
+
+    @classmethod
+    def _get_wrapped_eq(cls, **_) -> Callable:
+        def _wrapped_eq(wrapped_self, other) -> bool:
+            return wrapped_self._ref == other
+
+        return _wrapped_eq
 
     @classmethod
     def wraps(cls, content: Any) -> ContentWrapper:
@@ -72,20 +87,23 @@ class ContentWrapper:
             new_wrapped_type = cls._wrapped_types.get(original_type, None)
 
             if new_wrapped_type is None:
-                _wrapped_new = cls._get_wrapped_new(
-                    original=content, original_type=original_type
-                )
-                _wrapped_init = cls._get_wrapped_init()
-
                 class_name = cls._generate_class_name(original_type)
+
+                attr_dict = {
+                    "__new__": cls._get_wrapped_new(
+                        original=content, original_type=original_type
+                    ),
+                    "__init__": cls._get_wrapped_init(),
+                }
+                if original_type.__eq__ is object.__eq__:
+                    attr_dict["__eq__"] = cls._get_wrapped_eq()
+                if original_type.__hash__ is object.__hash__:
+                    attr_dict["__hash__"] = cls._get_wrapped_hash()
 
                 new_wrapped_type = type(
                     class_name,
                     (cls, original_type),
-                    {
-                        "__new__": _wrapped_new,
-                        "__init__": _wrapped_init,
-                    },
+                    attr_dict,
                 )
                 cls._wrapped_types[original_type] = new_wrapped_type
 
