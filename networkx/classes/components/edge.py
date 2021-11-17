@@ -26,7 +26,7 @@ class Edge(tuple, ContentWrapper):
         if init_key != self.__init_key:
             raise ValueError("Create Edge instance only using wraps()")
 
-        ContentWrapper.__init__(self)
+        ContentWrapper.__init__(self, None)
         tuple.__init__(self)
 
         if not all(is_node(e) for e in self):
@@ -75,7 +75,7 @@ class MultiEdge(Edge):
         if init_key != self.__init_key:
             raise ValueError("Create Edge instance only using wraps()")
 
-        ContentWrapper.__init__(self)
+        ContentWrapper.__init__(self, None)
         tuple.__init__(self)
 
         if not all(is_node(e) for e in self[:2]):
