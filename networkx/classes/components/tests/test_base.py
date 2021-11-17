@@ -102,7 +102,6 @@ class WrapperTestBase:
         # probably bugs in python, __setstate__ not working properly
         d = pickle.dumps(wrapped)
         s = pickle.loads(d)
-        t = type(s)
         for k, v in s.__dict__.items():
             assert (
                 getattr(wrapped, k) == v

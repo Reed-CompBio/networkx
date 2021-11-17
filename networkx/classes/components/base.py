@@ -92,7 +92,7 @@ class ContentWrapper(_RefWrapper[_T]):
     def _get_wrapped_getattribute(
         cls, *, original: _T, attrs: Set[str], **_
     ) -> Callable:
-        def _wrapped_getattribute(wrapped_self: _RefWrapper, item: str) -> Any:
+        def _wrapped_getattribute(_: _RefWrapper, item: str) -> Any:
             if item in attrs:
                 try:
                     return getattr(original, item)
@@ -105,7 +105,7 @@ class ContentWrapper(_RefWrapper[_T]):
 
     @classmethod
     def _get_wrapped_setattr(cls, *, original: _T, attrs: Set[str], **_) -> Callable:
-        def _wrapped_setattr(wrapped_self: _RefWrapper, name: str, value) -> Any:
+        def _wrapped_setattr(_: _RefWrapper, name: str, value) -> Any:
             if name in attrs:
                 try:
                     setattr(original, name, value)
