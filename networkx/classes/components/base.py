@@ -10,9 +10,11 @@ from typing import (
     Protocol,
     TypeVar,
     Set,
+    ClassVar,
 )
 
 GRAPHERY_TYPE_FLAG_NAME: Final[str] = "_graphery_type_flag"
+GRAPHERY_WRAP_REF_NAME: Final[str] = "__ref"
 GRAPHERY_TYPES: Final[Dict[str, Type[ContentWrapper]]] = {}
 
 
@@ -25,7 +27,8 @@ _T = TypeVar("_T")
 
 
 class _RefWrapper(Protocol[_T]):
-    _ref: _T
+    __ref: _T
+    ref: ClassVar[property]
 
 
 @collect_graphery_type
@@ -36,7 +39,7 @@ class ContentWrapper(_RefWrapper[_T]):
 
     def __init__(self, ref: _T) -> None:
         self._graphery_type_flag: Final[str] = self._graphery_type_flag
-        self._ref = ref
+        self.__ref = ref
 
     @property
     def graphery_type_flag(self) -> str:
@@ -44,7 +47,7 @@ class ContentWrapper(_RefWrapper[_T]):
 
     @property
     def ref(self) -> _T:
-        return self._ref
+        return self.__ref
 
     @classmethod
     def _generate_class_name(cls, original_type: Type) -> str:
@@ -77,23 +80,27 @@ class ContentWrapper(_RefWrapper[_T]):
     @classmethod
     def _get_wrapped_hash(cls, **_) -> Callable:
         def _wrapped_hash(wrapped_self: _RefWrapper) -> int:
-            return hash(wrapped_self._ref)
+            return hash(wrapped_self.ref)
 
         return _wrapped_hash
 
     @classmethod
     def _get_wrapped_eq(cls, **_) -> Callable:
         def _wrapped_eq(wrapped_self: _RefWrapper, other) -> bool:
-            return wrapped_self._ref == other
+            return wrapped_self.ref == other
 
         return _wrapped_eq
 
     @classmethod
     def _get_wrapped_getattribute(cls, *, attrs: Set[str], **_) -> Callable:
-        def _wrapped_getattribute(_: _RefWrapper, item: str) -> Any:
+        def _wrapped_getattribute(wrapped_self: _RefWrapper, item: str) -> Any:
             if item in attrs:
                 try:
-                    return getattr(super().__getattribute__("_ref"), item)
+                    return getattr(
+                        cls.__getattribute__(wrapped_self, "ref"),
+                        # super().__getattribute__("__ref"),
+                        item,
+                    )
                 except AttributeError:
                     return super().__getattribute__(item)
             else:
@@ -103,10 +110,15 @@ class ContentWrapper(_RefWrapper[_T]):
 
     @classmethod
     def _get_wrapped_setattr(cls, *, attrs: Set[str], **_) -> Callable:
-        def _wrapped_setattr(_: _RefWrapper, name: str, value) -> Any:
+        def _wrapped_setattr(wrapped_self: _RefWrapper, name: str, value) -> Any:
             if name in attrs:
                 try:
-                    setattr(super().__getattribute__("_ref"), name, value)
+                    setattr(
+                        cls.__getattribute__(wrapped_self, "ref"),
+                        # super().__getattribute__("__ref"),
+                        name,
+                        value,
+                    )
                 except AttributeError:
                     return super().__setattr__(name, value)
             else:
@@ -140,8 +152,12 @@ class ContentWrapper(_RefWrapper[_T]):
                         original=content, original_type=original_type
                     ),
                     "__init__": cls._get_wrapped_init(),
-                    "__getattribute__": cls._get_wrapped_getattribute(attrs=attr_set),
-                    "__setattr__": cls._get_wrapped_setattr(attrs=attr_set),
+                    "__getattribute__": cls._get_wrapped_getattribute(
+                        attrs=attr_set,
+                    ),
+                    "__setattr__": cls._get_wrapped_setattr(
+                        attrs=attr_set,
+                    ),
                 }
                 if original_type.__eq__ is object.__eq__:
                     attr_dict["__eq__"] = cls._get_wrapped_eq()
