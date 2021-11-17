@@ -80,14 +80,14 @@ class ContentWrapper(_RefWrapper[_T]):
     @classmethod
     def _get_wrapped_hash(cls, **_) -> Callable:
         def _wrapped_hash(wrapped_self: _RefWrapper) -> int:
-            return hash(wrapped_self.ref)
+            return hash(cls.__getattribute__(wrapped_self, "ref"))
 
         return _wrapped_hash
 
     @classmethod
     def _get_wrapped_eq(cls, **_) -> Callable:
         def _wrapped_eq(wrapped_self: _RefWrapper, other) -> bool:
-            return wrapped_self.ref == other
+            return cls.__getattribute__(wrapped_self, "ref") == other
 
         return _wrapped_eq
 
