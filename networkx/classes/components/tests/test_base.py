@@ -8,6 +8,10 @@ import pytest
 _T = TypeVar("_T")
 
 
+class C:
+    pass
+
+
 class B:
     __slots__ = ["a"]
 
@@ -37,6 +41,9 @@ class WrapperTestBase:
     wrapper_type: Type[ContentWrapper] = ContentWrapper
     wrapper_type_flag = "WrapperBase"
 
+    # -----------------
+    # helper def starts
+    # -----------------
     @staticmethod
     def _hash_test(wrapped: ContentWrapper, original):
         ha = hash(wrapped)
@@ -119,6 +126,24 @@ class WrapperTestBase:
                 getattr(wrapped, k) == v
             ), f"key {k} in pickled obj does not match the original one"
 
+    @classmethod
+    def _test_new_type_creation(cls, wrapped: Any, *, created_new_type: bool):
+        if created_new_type:
+            assert isinstance(
+                wrapped, cls.wrapper_type
+            ), f"{wrapped} is not a type of {cls.wrapper_type} when it should be"
+        else:
+            assert not isinstance(
+                wrapped, cls.wrapper_type
+            ), f"{wrapped} is a type of {cls.wrapper_type} when it should not be"
+
+    # ---------------
+    # helper def ends
+    # ---------------
+
+    # ------------------------
+    # actual tester def starts
+    # ------------------------
     def test_type_collection(self):
         assert (
             self.wrapper_type
@@ -127,6 +152,7 @@ class WrapperTestBase:
 
     def test_built_in_immutables(self, content) -> wrapper_type:
         wrapped = self.wrapper_type.wraps(content)
+        self._test_new_type_creation(wrapped, created_new_type=True)
         self._equal_test(wrapped, content)
         self._hash_test(wrapped, content)
         self._type_equal_test(wrapped, content)
@@ -143,27 +169,27 @@ class WrapperTestBase:
         init_value: Any = None,
         mod_fn: Callable[[_T, Any], None] = None,
         mod_val: Any = None,
-    ) -> wrapper_type:
-        assert defined_cls is not None
-        assert init_value is not None
-
-        content = defined_cls(init_value)
-        wrapped = self.wrapper_type.wraps(content)
-        self._equal_test(wrapped, content)
-        self._hash_test(wrapped, content)
-        self._type_equal_test(wrapped, content)
-        self._test_dict_attr_equal(wrapped, content)
-        self._test_property_attr_equal(wrapped, content)
-
-        # change member attr
-        if mod_fn is not None and mod_val is not None:
-            mod_fn(content, mod_val)
+    ) -> wrapper_type | None:
+        if defined_cls is not None and init_value is not None:
+            content = defined_cls(init_value)
+            wrapped = self.wrapper_type.wraps(content)
+            self._test_new_type_creation(wrapped, created_new_type=False)
             self._equal_test(wrapped, content)
             self._hash_test(wrapped, content)
             self._type_equal_test(wrapped, content)
             self._test_dict_attr_equal(wrapped, content)
             self._test_property_attr_equal(wrapped, content)
-        return wrapped
+
+            if mod_fn is not None and mod_val is not None:
+                mod_fn(content, mod_val)
+                self._equal_test(wrapped, content)
+                self._hash_test(wrapped, content)
+                self._type_equal_test(wrapped, content)
+                self._test_dict_attr_equal(wrapped, content)
+                self._test_property_attr_equal(wrapped, content)
+            return wrapped
+
+        return None
 
     def test_user_defined_immutable_class(
         self,
@@ -172,24 +198,27 @@ class WrapperTestBase:
         mod_fn: Callable[[_T, Any], None] = None,
         mod_val: Iterable = None,
     ):
-        assert defined_cls is not None
-        assert init_value is not None
-
-        content = defined_cls(*init_value)
-        wrapped = self.wrapper_type.wraps(content)
-        self._equal_test(wrapped, content)
-        self._hash_test(wrapped, content)
-        self._type_equal_test(wrapped, content)
-        self._test_slot_attr_equal(wrapped, content)
-        self._test_property_attr_equal(wrapped, content)
-
-        if mod_fn is not None and isinstance(mod_val, Iterable):
-            mod_fn(content, *mod_val)
+        if defined_cls is not None and init_value is not None:
+            content = defined_cls(*init_value)
+            wrapped = self.wrapper_type.wraps(content)
+            self._test_new_type_creation(wrapped, created_new_type=True)
             self._equal_test(wrapped, content)
             self._hash_test(wrapped, content)
             self._type_equal_test(wrapped, content)
             self._test_slot_attr_equal(wrapped, content)
             self._test_property_attr_equal(wrapped, content)
+
+            if mod_fn is not None and isinstance(mod_val, Iterable):
+                mod_fn(content, *mod_val)
+                self._equal_test(wrapped, content)
+                self._hash_test(wrapped, content)
+                self._type_equal_test(wrapped, content)
+                self._test_slot_attr_equal(wrapped, content)
+                self._test_property_attr_equal(wrapped, content)
+
+    # ----------------------
+    # actual tester def ends
+    # ----------------------
 
 
 class TestContentWrapper(WrapperTestBase):
@@ -209,5 +238,7 @@ class TestContentWrapper(WrapperTestBase):
         )
 
     def test_user_defined_immutable_class(self, **_):
-        super(TestContentWrapper, self).test_user_defined_immutable_class(B, (10,))
+        super(TestContentWrapper, self).test_user_defined_immutable_class(
+            B, (10,), B.change, (20,)
+        )
         super(TestContentWrapper, self).test_user_defined_immutable_class(object, ())

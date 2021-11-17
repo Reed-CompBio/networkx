@@ -5,7 +5,11 @@ from .test_base import WrapperTestBase, A, B
 import pytest
 
 
-class TestEdge(WrapperTestBase):
+class EdgeTestBase(WrapperTestBase):
+    pass
+
+
+class TestEdge(EdgeTestBase):
     wrapper_type = Edge
     wrapper_type_flag = "Edge"
 
@@ -24,19 +28,14 @@ class TestEdge(WrapperTestBase):
         wrapped = super(TestEdge, self).test_built_in_immutables(content)
         self._edge_is_tuple(wrapped, content)
 
-    def test_user_defined_mutable_class(self, **_) -> wrapper_type:
-        def _custom_gen(val) -> Edge:
-            return Edge.wraps(A(val), 1)
-
-        wrapped = super(TestEdge, self).test_user_defined_mutable_class(
-            _custom_gen, 10, None, None
-        )
-
-        return wrapped
-
     def test_user_defined_immutable_class(self, **_):
         def _custom_gen(cls, *val) -> Edge:
             return Edge.wraps(cls(*val), 1)
 
-        super(TestEdge, self).test_user_defined_immutable_class(_custom_gen, (B, 10))
+        super(TestEdge, self).test_user_defined_immutable_class(
+            _custom_gen, (A, 10), A.change, (20,)
+        )
+        super(TestEdge, self).test_user_defined_immutable_class(
+            _custom_gen, (B, 10), B.change, (20,)
+        )
         super(TestEdge, self).test_user_defined_immutable_class(_custom_gen, (object,))
