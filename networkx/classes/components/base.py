@@ -89,13 +89,11 @@ class ContentWrapper(_RefWrapper[_T]):
         return _wrapped_eq
 
     @classmethod
-    def _get_wrapped_getattribute(
-        cls, *, original: _T, attrs: Set[str], **_
-    ) -> Callable:
+    def _get_wrapped_getattribute(cls, *, attrs: Set[str], **_) -> Callable:
         def _wrapped_getattribute(_: _RefWrapper, item: str) -> Any:
             if item in attrs:
                 try:
-                    return getattr(original, item)
+                    return getattr(super().__getattribute__("_ref"), item)
                 except AttributeError:
                     return super().__getattribute__(item)
             else:
@@ -104,11 +102,11 @@ class ContentWrapper(_RefWrapper[_T]):
         return _wrapped_getattribute
 
     @classmethod
-    def _get_wrapped_setattr(cls, *, original: _T, attrs: Set[str], **_) -> Callable:
+    def _get_wrapped_setattr(cls, *, attrs: Set[str], **_) -> Callable:
         def _wrapped_setattr(_: _RefWrapper, name: str, value) -> Any:
             if name in attrs:
                 try:
-                    setattr(original, name, value)
+                    setattr(super().__getattribute__("_ref"), name, value)
                 except AttributeError:
                     return super().__setattr__(name, value)
             else:
@@ -142,12 +140,8 @@ class ContentWrapper(_RefWrapper[_T]):
                         original=content, original_type=original_type
                     ),
                     "__init__": cls._get_wrapped_init(),
-                    "__getattribute__": cls._get_wrapped_getattribute(
-                        original=content, attrs=attr_set
-                    ),
-                    "__setattr__": cls._get_wrapped_setattr(
-                        original=content, attrs=attr_set
-                    ),
+                    "__getattribute__": cls._get_wrapped_getattribute(attrs=attr_set),
+                    "__setattr__": cls._get_wrapped_setattr(attrs=attr_set),
                 }
                 if original_type.__eq__ is object.__eq__:
                     attr_dict["__eq__"] = cls._get_wrapped_eq()
