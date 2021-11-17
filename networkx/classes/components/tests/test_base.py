@@ -64,6 +64,13 @@ class WrapperTestBase:
         ), f"hash assertion failed for {wrapped}({ha}) and {original}({hb})"
 
     @staticmethod
+    def _test_wrap_ref_equal_test(wrapped: ContentWrapper, original):
+        w_ref = wrapped.__class__.__getattribute__(wrapped, "ref")
+        assert (
+            w_ref == original
+        ), f"wrapped ref({w_ref}) does not equal to original {original}"
+
+    @staticmethod
     def _equal_test(wrapped: ContentWrapper, original):
         assert (
             wrapped == original
@@ -87,8 +94,8 @@ class WrapperTestBase:
                 wv = getattr(wrapped, k)
                 ov = original.__dict__[k]
                 assert (
-                    ov == wv
-                ), f"attr {k}({ov}) in original does not equal to {k}({wv}) in wrapper"
+                    wv == ov
+                ), f"attr {k}({wv}) in wrapped does not equal to {k}({ov}) in original"
 
     @staticmethod
     def _test_slot_attr_equal(wrapped: ContentWrapper, original):
@@ -97,8 +104,8 @@ class WrapperTestBase:
                 wv = getattr(wrapped, k)
                 ov = getattr(original, k)
                 assert (
-                    ov == wv
-                ), f"attr {k}({ov}) in original does not equal to {k}({wv}) in wrapper"
+                    wv == ov
+                ), f"attr {k}({wv}) in wrapped does not equal to {k}({ov}) in original"
 
     @staticmethod
     def _test_property_attr_equal(wrapped: ContentWrapper, original):
@@ -106,7 +113,9 @@ class WrapperTestBase:
             if isinstance(getattr(original.__class__, k), property):
                 wv = getattr(wrapped, k)
                 ov = getattr(original, k)
-                assert wv == ov, f"attr {k}({wv}) in a does not equal to {k}({ov}) in b"
+                assert (
+                    wv == ov
+                ), f"attr {k}({wv}) in wrapped does not equal to {k}({ov}) in original"
 
     @classmethod
     def _contains_wrapper_type(cls, wrapped: ContentWrapper):
