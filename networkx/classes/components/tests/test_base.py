@@ -9,7 +9,17 @@ _T = TypeVar("_T")
 
 
 class C:
-    pass
+    __slots__ = ["a", "__dict__"]
+
+    def __init__(self, arg):
+        self.a = arg
+
+    def change(self, arg):
+        self.a = arg
+
+    @property
+    def mod_attr(self):
+        return f"{self.a} mod"
 
 
 class B:
@@ -21,6 +31,7 @@ class B:
     def change(self, arg):
         self.a = arg
 
+    @property
     def mod_attr(self):
         return f"{self.a} mod"
 
@@ -70,11 +81,14 @@ class WrapperTestBase:
     @staticmethod
     def _test_dict_attr_equal(wrapped: ContentWrapper, original):
         if hasattr(wrapped, "__dict__") and hasattr(original, "__dict__"):
-            for k, v in original.__dict__.items():
+
+            for k in original.__dict__:
                 assert k in wrapped.__dict__, f"attr {k} is not in a"
+                wv = getattr(wrapped, k)
+                ov = original.__dict__[k]
                 assert (
-                    v == original.__dict__[k]
-                ), f"attr {k}({v}) in a does not equal to {k}({original.__dict__[k]}) in b"
+                    ov == wv
+                ), f"attr {k}({ov}) in original does not equal to {k}({wv}) in wrapper"
 
     @staticmethod
     def _test_slot_attr_equal(wrapped: ContentWrapper, original):
@@ -82,7 +96,9 @@ class WrapperTestBase:
             for k in original.__slots__:
                 wv = getattr(wrapped, k)
                 ov = getattr(original, k)
-                assert wv == ov, f"attr {k}({wv}) in a does not equal to {k}({ov}) in b"
+                assert (
+                    ov == wv
+                ), f"attr {k}({ov}) in original does not equal to {k}({wv}) in wrapper"
 
     @staticmethod
     def _test_property_attr_equal(wrapped: ContentWrapper, original):
@@ -166,12 +182,12 @@ class WrapperTestBase:
     def test_user_defined_mutable_class(
         self,
         defined_cls: Callable[..., _T] = None,
-        init_value: Any = None,
+        init_value: Iterable = None,
         mod_fn: Callable[[_T, Any], None] = None,
-        mod_val: Any = None,
+        mod_val: Iterable = None,
     ) -> wrapper_type | None:
         if defined_cls is not None and init_value is not None:
-            content = defined_cls(init_value)
+            content = defined_cls(*init_value)
             wrapped = self.wrapper_type.wraps(content)
             self._test_new_type_creation(wrapped, created_new_type=False)
             self._equal_test(wrapped, content)
@@ -181,7 +197,7 @@ class WrapperTestBase:
             self._test_property_attr_equal(wrapped, content)
 
             if mod_fn is not None and mod_val is not None:
-                mod_fn(content, mod_val)
+                mod_fn(content, *mod_val)
                 self._equal_test(wrapped, content)
                 self._hash_test(wrapped, content)
                 self._type_equal_test(wrapped, content)
@@ -232,13 +248,35 @@ class TestContentWrapper(WrapperTestBase):
     def test_built_in_immutables(self, content: Any):
         super().test_built_in_immutables(content)
 
-    def test_user_defined_mutable_class(self, **_):
+    @pytest.mark.parametrize(
+        "defined_cls, init_value, mod_fn, mod_val",
+        [
+            pytest.param(A, (10,), A.change, (20,)),
+            pytest.param(C, (10,), C.change, (20,)),
+        ],
+    )
+    def test_user_defined_mutable_class(
+        self,
+        defined_cls: Callable[..., _T],
+        init_value: Iterable,
+        mod_fn: Callable[[_T, Any], None],
+        mod_val: Iterable,
+    ):
         super(TestContentWrapper, self).test_user_defined_mutable_class(
-            A, 10, A.change, 20
+            defined_cls, init_value, mod_fn, mod_val
         )
 
-    def test_user_defined_immutable_class(self, **_):
+    @pytest.mark.parametrize(
+        "defined_cls, init_value, mod_fn, mod_val",
+        [pytest.param(B, (10,), B.change, (20,)), pytest.param(object, (), None, None)],
+    )
+    def test_user_defined_immutable_class(
+        self,
+        defined_cls: Callable[..., _T],
+        init_value: Iterable,
+        mod_fn: Callable[[_T, Any], None],
+        mod_val: Iterable,
+    ):
         super(TestContentWrapper, self).test_user_defined_immutable_class(
-            B, (10,), B.change, (20,)
+            defined_cls, init_value, mod_fn, mod_val
         )
-        super(TestContentWrapper, self).test_user_defined_immutable_class(object, ())
