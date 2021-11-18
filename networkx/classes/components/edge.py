@@ -37,11 +37,15 @@ class Edge(tuple, ContentWrapper):
         if len(content) == 1:
             content = content[0]
             if len(content) != 2:
-                raise ValueError("Edge only wraps length 2 sequence or two elements")
+                raise ValueError(
+                    "Edge only wraps length 2 sequence or two elements (node, node)"
+                )
             if cls.is_edge(content):
                 return content
         elif len(content) != 2:
-            raise ValueError("Edge only wraps length 2 sequence or two elements")
+            raise ValueError(
+                "Edge only wraps length 2 sequence or two elements (node, node)"
+            )
 
         u, v = content
         u, v = Node.wraps(u), Node.wraps(v)
@@ -61,6 +65,7 @@ class Edge(tuple, ContentWrapper):
         return cls._is_wrapper_type(c)
 
 
+@collect_graphery_type
 class MultiEdge(Edge):
     _graphery_type_flag = "MultiEdge"
     _wrapped_types = None
@@ -73,24 +78,28 @@ class MultiEdge(Edge):
 
     def __init__(self, _: Sequence = (), init_key: int = 1):
         if init_key != self.__init_key:
-            raise ValueError("Create Edge instance only using wraps()")
+            raise ValueError("Create MultiEdge instance only using wraps()")
 
         ContentWrapper.__init__(self, None)
         tuple.__init__(self)
 
         if not all(is_node(e) for e in self[:2]):
-            raise TypeError("Elements of an Edge have to be Node")
+            raise TypeError("First two elements of an MultiEdge have to be Node")
 
     @classmethod
     def wraps(cls, *content) -> MultiEdge:
         if len(content) == 1:
             content = content[0]
             if len(content) != 3:
-                raise ValueError("Edge only wraps length 2 sequence or two elements")
+                raise ValueError(
+                    "MultiEdge only wraps length 3 sequence or three elements (node, node, key)"
+                )
             if cls.is_edge(content):
                 return content
         elif len(content) != 3:
-            raise ValueError("Edge only wraps length 2 sequence or two elements")
+            raise ValueError(
+                "MultiEdge only wraps length 3 sequence or three elements (node, node, key)"
+            )
 
         u, v, k = content
         u, v = Node.wraps(u), Node.wraps(v)
