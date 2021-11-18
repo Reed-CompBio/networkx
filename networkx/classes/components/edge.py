@@ -33,7 +33,7 @@ class Edge(tuple, ContentWrapper):
     def wraps(cls, *content) -> Edge:
         if len(content) == 1:
             content = content[0]
-            if len(content) != 2:
+            if not isinstance(content, Sequence) or len(content) != 2:
                 raise ValueError(
                     "Edge only wraps length 2 sequence or two elements (node, node)"
                 )
@@ -84,7 +84,7 @@ class DataEdge(Edge):
     def wraps(cls, *content) -> DataEdge:
         if len(content) == 1:
             content = content[0]
-            if len(content) != 3:
+            if not isinstance(content, Sequence) or len(content) != 3:
                 raise ValueError(
                     "DataEdge only wraps length 3 sequence or three elements (node, node, data)"
                 )
@@ -127,7 +127,7 @@ class MultiEdge(Edge):
     def wraps(cls, *content) -> MultiEdge:
         if len(content) == 1:
             content = content[0]
-            if len(content) != 3:
+            if not isinstance(content, Sequence) or len(content) != 3:
                 raise ValueError(
                     "MultiEdge only wraps length 3 sequence or three elements (node, node, key)"
                 )
@@ -170,7 +170,7 @@ class DataMultiEdge(Edge):
     def wraps(cls, *content) -> DataMultiEdge:
         if len(content) == 1:
             content = content[0]
-            if len(content) != 4:
+            if not isinstance(content, Sequence) or len(content) != 4:
                 raise ValueError(
                     "DataMultiEdge only wraps length 4 sequence or four elements (node, node, key, data)"
                 )
