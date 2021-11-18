@@ -19,7 +19,7 @@ authors = {
     "Hagberg": ("Aric Hagberg", "hagberg@lanl.gov"),
     "Schult": ("Dan Schult", "dschult@colgate.edu"),
     "Swart": ("Pieter Swart", "swart@lanl.gov"),
-    "Zeng": ("Larry Zeng", "zengl@reed.edu")
+    "Zeng": ("Larry Zeng", "zengl@reed.edu"),
 }
 maintainer = "Graphery Developers"
 maintainer_email = "graphery@reed.edu"
@@ -47,9 +47,7 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -147,6 +145,7 @@ package_data = {
     "networkx.algorithms.traversal": ["tests/*.py"],
     "networkx.algorithms.tree": ["tests/*.py"],
     "networkx.classes": ["tests/*.py"],
+    "networkx.classes.components": ["tests/*.py"],
     "networkx.generators": ["tests/*.py", "atlas.dat.gz"],
     "networkx.drawing": ["tests/*.py"],
     "networkx.linalg": ["tests/*.py"],
@@ -158,8 +157,8 @@ package_data = {
 
 
 def parse_requirements_file(filename):
-    with open(filename) as fid:
-        requires = [l.strip() for l in fid.readlines() if not l.startswith("#")]
+    with open(filename) as f:
+        requires = [li.strip() for li in f.readlines() if not li.startswith("#")]
 
     return requires
 
@@ -194,6 +193,6 @@ if __name__ == "__main__":
         package_data=package_data,
         install_requires=install_requires,
         extras_require=extras_require,
-        python_requires=">=3.7",
+        python_requires=">=3.10",
         zip_safe=False,
     )
