@@ -709,14 +709,14 @@ class OutEdgeDataView:
         self._default = default
         # Set _report based on data and default
         if data is True:
-            self._report = lambda n, nbr, dd: (n, nbr, dd)
+            self._report = lambda n, nbr, dd: nx.DataEdge.wraps(n, nbr, dd)
         elif data is False:
-            self._report = lambda n, nbr, dd: (n, nbr)
+            self._report = lambda n, nbr, dd: nx.Edge.wraps(n, nbr)
         else:  # data is attribute name
             self._report = (
-                lambda n, nbr, dd: (n, nbr, dd[data])
+                lambda n, nbr, dd: nx.DataEdge.wraps(n, nbr, dd[data])
                 if data in dd
-                else (n, nbr, default)
+                else nx.DataEdge.wraps(n, nbr, default)
             )
 
     def __len__(self):
@@ -856,26 +856,28 @@ class OutMultiEdgeDataView(OutEdgeDataView):
         # Set _report based on data and default
         if data is True:
             if keys is True:
-                self._report = lambda n, nbr, k, dd: (n, nbr, k, dd)
+                self._report = lambda n, nbr, k, dd: nx.DataMultiEdge.wraps(
+                    n, nbr, k, dd
+                )
             else:
-                self._report = lambda n, nbr, k, dd: (n, nbr, dd)
+                self._report = lambda n, nbr, k, dd: nx.DataEdge.wraps(n, nbr, dd)
         elif data is False:
             if keys is True:
-                self._report = lambda n, nbr, k, dd: (n, nbr, k)
+                self._report = lambda n, nbr, k, dd: nx.MultiEdge.wraps(n, nbr, k)
             else:
-                self._report = lambda n, nbr, k, dd: (n, nbr)
+                self._report = lambda n, nbr, k, dd: nx.Edge.wraps(n, nbr)
         else:  # data is attribute name
             if keys is True:
                 self._report = (
-                    lambda n, nbr, k, dd: (n, nbr, k, dd[data])
+                    lambda n, nbr, k, dd: nx.DataMultiEdge.wraps(n, nbr, k, dd[data])
                     if data in dd
-                    else (n, nbr, k, default)
+                    else nx.DataMultiEdge.wraps(n, nbr, k, default)
                 )
             else:
                 self._report = (
-                    lambda n, nbr, k, dd: (n, nbr, dd[data])
+                    lambda n, nbr, k, dd: nx.DataEdge.wraps(n, nbr, dd[data])
                     if data in dd
-                    else (n, nbr, default)
+                    else nx.DataEdge.wraps(n, nbr, default)
                 )
 
     def __len__(self):
