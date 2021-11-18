@@ -1,17 +1,19 @@
 from __future__ import annotations
 
-from typing import TypeVar
+from typing import Any, TypeGuard
 
-from .base import ContentWrapper
-
-
-_T = TypeVar("_T")
+from .base import ContentWrapper, collect_graphery_type, GRAPHERY_TYPE_FLAG_NAME
 
 
-class Node(ContentWrapper[_T]):
-    def __init__(self, node_value: _T) -> None:
-        if node_value is None:
-            raise TypeError("Node cannot accept None as content.")
-        if isinstance(node_value, Node):
-            raise TypeError("Node cannot nest Node Type as content")
-        super(Node, self).__init__(node_value)
+@collect_graphery_type
+class Node(ContentWrapper):
+    _graphery_type_flag = "Node"
+    _wrapped_types = {}
+    _wrapped_type_prefix = "N"
+
+    @classmethod
+    def is_node(cls, c: Any) -> TypeGuard[Node]:
+        return cls._is_wrapper_type(c)
+
+
+is_node = Node.is_node
