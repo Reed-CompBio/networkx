@@ -1,4 +1,4 @@
-from typing import Type, Any, Callable, TypeVar, Iterable
+from typing import Type, Any, Callable, TypeVar, Iterable, Tuple
 
 from ..base import ContentWrapper, GRAPHERY_TYPE_FLAG_NAME, GRAPHERY_TYPES
 import pickle
@@ -194,7 +194,7 @@ class WrapperTestBase:
         init_value: Iterable = None,
         mod_fn: Callable[[_T, Any], None] = None,
         mod_val: Iterable = None,
-    ) -> wrapper_type | None:
+    ) -> Tuple[wrapper_type, _T] | Tuple[None, None]:
         if defined_cls is not None and init_value is not None:
             content = defined_cls(*init_value)
             wrapped = self.wrapper_type.wraps(content)
@@ -212,9 +212,9 @@ class WrapperTestBase:
                 self._type_equal_test(wrapped, content)
                 self._test_dict_attr_equal(wrapped, content)
                 self._test_property_attr_equal(wrapped, content)
-            return wrapped
+            return wrapped, content
 
-        return None
+        return None, None
 
     def test_user_defined_immutable_class(
         self,
@@ -222,7 +222,7 @@ class WrapperTestBase:
         init_value: Iterable = None,
         mod_fn: Callable[[_T, Any], None] = None,
         mod_val: Iterable = None,
-    ):
+    ) -> Tuple[ContentWrapper, _T] | Tuple[None, None]:
         if defined_cls is not None and init_value is not None:
             content = defined_cls(*init_value)
             wrapped = self.wrapper_type.wraps(content)
@@ -240,6 +240,9 @@ class WrapperTestBase:
                 self._type_equal_test(wrapped, content)
                 self._test_slot_attr_equal(wrapped, content)
                 self._test_property_attr_equal(wrapped, content)
+
+            return wrapped, content
+        return None, None
 
     # ----------------------
     # actual tester def ends
