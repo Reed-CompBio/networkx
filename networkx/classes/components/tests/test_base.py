@@ -51,12 +51,15 @@ class A:
 class WrapperTestBase:
     wrapper_type: Type[ContentWrapper] = ContentWrapper
     wrapper_type_flag = "WrapperBase"
+    no_hash = False
 
     # -----------------
     # helper def starts
     # -----------------
-    @staticmethod
-    def _hash_test(wrapped: ContentWrapper, original):
+    @classmethod
+    def _hash_test(cls, wrapped: ContentWrapper, original):
+        if cls.no_hash:
+            return
         ha = hash(wrapped)
         hb = hash(original)
         assert (
