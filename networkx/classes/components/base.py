@@ -41,9 +41,10 @@ class ContentWrapper(_RefWrapper[_T]):
         self._graphery_type_flag: Final[str] = self._graphery_type_flag
         self.__ref = ref
 
+    @classmethod
     @property
-    def graphery_type_flag(self) -> str:
-        return self._graphery_type_flag
+    def graphery_type_flag(cls) -> str:
+        return cls._graphery_type_flag
 
     @property
     def ref(self) -> _T:
