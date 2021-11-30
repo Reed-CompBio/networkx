@@ -79,6 +79,22 @@ class WrapperTestBase:
             wrapped == original
         ), f"equal assertion failed for {wrapped} and {original}"
 
+    @staticmethod
+    def _repr_equal_test(wrapped: ContentWrapper, original):
+        w_rp = repr(wrapped)
+        o_rp = repr(original)
+        assert (
+            w_rp == o_rp
+        ), f"wrapped repr ({w_rp}) does not equal to original repr ({o_rp})"
+
+    @staticmethod
+    def _str_equal_test(wrapped: ContentWrapper, original):
+        w_rp = str(wrapped)
+        o_rp = str(original)
+        assert (
+            w_rp == o_rp
+        ), f"wrapped str ({w_rp}) does not equal to original str ({o_rp})"
+
     @classmethod
     def _type_equal_test(cls, wrapped: ContentWrapper, original):
         assert isinstance(
@@ -182,6 +198,7 @@ class WrapperTestBase:
         wrapped = self.wrapper_type.wraps(content)
         self._test_new_type_creation(wrapped, created_new_type=True)
         self._equal_test(wrapped, content)
+        self._repr_equal_test(wrapped, content)
         self._hash_test(wrapped, content)
         self._type_equal_test(wrapped, content)
         self._test_dict_attr_equal(wrapped, content)
@@ -203,6 +220,7 @@ class WrapperTestBase:
             wrapped = self.wrapper_type.wraps(content)
             self._test_new_type_creation(wrapped, created_new_type=False)
             self._equal_test(wrapped, content)
+            self._repr_equal_test(wrapped, content)
             self._hash_test(wrapped, content)
             self._type_equal_test(wrapped, content)
             self._test_dict_attr_equal(wrapped, content)
@@ -211,6 +229,7 @@ class WrapperTestBase:
             if mod_fn is not None and mod_val is not None:
                 mod_fn(content, *mod_val)
                 self._equal_test(wrapped, content)
+                self._repr_equal_test(wrapped, content)
                 self._hash_test(wrapped, content)
                 self._type_equal_test(wrapped, content)
                 self._test_dict_attr_equal(wrapped, content)
@@ -231,6 +250,7 @@ class WrapperTestBase:
             wrapped = self.wrapper_type.wraps(content)
             self._test_new_type_creation(wrapped, created_new_type=True)
             self._equal_test(wrapped, content)
+            self._repr_equal_test(wrapped, content)
             self._hash_test(wrapped, content)
             self._type_equal_test(wrapped, content)
             self._test_slot_attr_equal(wrapped, content)
@@ -239,6 +259,7 @@ class WrapperTestBase:
             if mod_fn is not None and isinstance(mod_val, Iterable):
                 mod_fn(content, *mod_val)
                 self._equal_test(wrapped, content)
+                self._repr_equal_test(wrapped, content)
                 self._hash_test(wrapped, content)
                 self._type_equal_test(wrapped, content)
                 self._test_slot_attr_equal(wrapped, content)

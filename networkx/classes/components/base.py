@@ -191,5 +191,11 @@ class ContentWrapper(_RefWrapper[_T]):
     def is_content_wrapper(cls, c: Any) -> TypeGuard[ContentWrapper]:
         return cls._is_wrapper_type(c)
 
+    def __str__(self):
+        return str(self.ref)
+
+    def __repr__(self):
+        return repr(self.ref)
+
 
 is_content_wrapper = ContentWrapper.is_content_wrapper
