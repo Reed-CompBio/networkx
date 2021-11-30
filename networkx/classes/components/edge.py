@@ -19,11 +19,11 @@ class Edge(tuple, ContentWrapper):
     def __new__(cls, seq: Sequence = (), init_key: int = 1):
         return tuple.__new__(cls, seq)
 
-    def __init__(self, _: Sequence = (), init_key: int = 1):
+    def __init__(self, e: Sequence = (), init_key: int = 1):
         if init_key != self.__init_key:
             raise ValueError("Create Edge instance only using wraps()")
 
-        ContentWrapper.__init__(self, None)
+        ContentWrapper.__init__(self, e)
         tuple.__init__(self)
 
         if not all(is_node(e) for e in self):
@@ -70,11 +70,11 @@ class DataEdge(Edge):
 
     __init_key = hash(object())
 
-    def __init__(self, _: Sequence = (), init_key: int = 1):
+    def __init__(self, e: Sequence = (), init_key: int = 1):
         if init_key != self.__init_key:
             raise ValueError("Create DataEdge instance only using wraps()")
 
-        ContentWrapper.__init__(self, None)
+        ContentWrapper.__init__(self, e)
         tuple.__init__(self)
 
         if not all(is_node(e) for e in self[:2]):
@@ -88,7 +88,7 @@ class DataEdge(Edge):
                 raise ValueError(
                     "DataEdge only wraps length 3 sequence or three elements (node, node, data)"
                 )
-            if cls.is_edge(content):
+            if cls.is_data_edge(content):
                 return content
         elif len(content) != 3:
             raise ValueError(
@@ -113,11 +113,11 @@ class MultiEdge(Edge):
 
     __init_key = hash(object())
 
-    def __init__(self, _: Sequence = (), init_key: int = 1):
+    def __init__(self, e: Sequence = (), init_key: int = 1):
         if init_key != self.__init_key:
             raise ValueError("Create MultiEdge instance only using wraps()")
 
-        ContentWrapper.__init__(self, None)
+        ContentWrapper.__init__(self, e)
         tuple.__init__(self)
 
         if not all(is_node(e) for e in self[:2]):
@@ -131,7 +131,7 @@ class MultiEdge(Edge):
                 raise ValueError(
                     "MultiEdge only wraps length 3 sequence or three elements (node, node, key)"
                 )
-            if cls.is_edge(content):
+            if cls.is_multi_edge(content):
                 return content
         elif len(content) != 3:
             raise ValueError(
@@ -156,11 +156,11 @@ class DataMultiEdge(Edge):
 
     __init_key = hash(object())
 
-    def __init__(self, _: Sequence = (), init_key: int = 1):
+    def __init__(self, e: Sequence = (), init_key: int = 1):
         if init_key != self.__init_key:
             raise ValueError("Create MultiEdge instance only using wraps()")
 
-        ContentWrapper.__init__(self, None)
+        ContentWrapper.__init__(self, e)
         tuple.__init__(self)
 
         if not all(is_node(e) for e in self[:2]):
@@ -174,7 +174,7 @@ class DataMultiEdge(Edge):
                 raise ValueError(
                     "DataMultiEdge only wraps length 4 sequence or four elements (node, node, key, data)"
                 )
-            if cls.is_edge(content):
+            if cls.is_data_multi_edge(content):
                 return content
         elif len(content) != 4:
             raise ValueError(
