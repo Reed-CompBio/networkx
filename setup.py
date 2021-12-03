@@ -83,6 +83,7 @@ packages = [
     "networkx.algorithms.approximation",
     "networkx.algorithms.tree",
     "networkx.classes",
+    "networkx.classes.components",
     "networkx.generators",
     "networkx.drawing",
     "networkx.linalg",
