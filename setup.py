@@ -3,11 +3,10 @@ import os
 import sys
 from setuptools import setup
 
-if sys.version_info[:2] < (3, 7):
+if sys.version_info[:2] < (3, 8):
     error = (
-        "NetworkX 2.6+ requires Python 3.7 or later (%d.%d detected). \n"
-        "For Python 2.7, please install version 2.2 using: \n"
-        "$ pip install 'networkx==2.2'" % sys.version_info[:2]
+        "NetworkG, the NetworkX Graphery Wrapper, 2.7+ " 
+        "requires Python 3.10 or later (%d.%d detected). \n"
     )
     sys.stderr.write(error + "\n")
     sys.exit(1)
@@ -148,7 +147,7 @@ package_data = {
     "networkx.classes": ["tests/*.py"],
     "networkx.classes.components": ["tests/*.py"],
     "networkx.generators": ["tests/*.py", "atlas.dat.gz"],
-    "networkx.drawing": ["tests/*.py"],
+    "networkx.drawing": ["tests/*.py", "tests/baseline/*png"],
     "networkx.linalg": ["tests/*.py"],
     "networkx.readwrite": ["tests/*.py"],
     "networkx.readwrite.json_graph": ["tests/*.py"],
@@ -170,7 +169,7 @@ extras_require = {
     for dep in ["default", "developer", "doc", "extra", "test"]
 }.copy()
 
-with open("README.rst", "r") as fh:
+with open("README.rst") as fh:
     long_description = fh.read()
 
 if __name__ == "__main__":
