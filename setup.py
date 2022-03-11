@@ -5,7 +5,7 @@ from setuptools import setup
 
 if sys.version_info[:2] < (3, 8):
     error = (
-        "NetworkG, the NetworkX Graphery Wrapper, 2.7+ " 
+        "NetworkG, the NetworkX Graphery Wrapper, 2.7+ "
         "requires Python 3.10 or later (%d.%d detected). \n"
     )
     sys.stderr.write(error + "\n")
