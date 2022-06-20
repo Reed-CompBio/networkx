@@ -11,12 +11,12 @@ can be accessed, for example, as
 1
 """
 
-from collections import defaultdict, deque
-from collections.abc import Iterable, Iterator, Sized
-import warnings
 import sys
 import uuid
-from itertools import tee, chain
+import warnings
+from collections import defaultdict, deque
+from collections.abc import Iterable, Iterator, Sized
+from itertools import chain, tee
 
 import networkx as nx
 
@@ -227,14 +227,31 @@ def dict_to_numpy_array(d, mapping=None):
     """Convert a dictionary of dictionaries to a numpy array
     with optional mapping."""
     try:
-        return dict_to_numpy_array2(d, mapping)
+        return _dict_to_numpy_array2(d, mapping)
     except (AttributeError, TypeError):
         # AttributeError is when no mapping was provided and v.keys() fails.
         # TypeError is when a mapping was provided and d[k1][k2] fails.
-        return dict_to_numpy_array1(d, mapping)
+        return _dict_to_numpy_array1(d, mapping)
 
 
 def dict_to_numpy_array2(d, mapping=None):
+    """Convert a dict of dicts to a 2d numpy array with optional mapping.
+
+    .. deprecated:: 2.8
+
+       dict_to_numpy_array2 is deprecated and will be removed in networkx 3.0.
+       Use `dict_to_numpy_array` instead.
+    """
+    msg = (
+        "dict_to_numpy_array2 is deprecated and will be removed in networkx 3.0.\n"
+        "Use dict_to_numpy_array instead."
+    )
+    warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
+    return _dict_to_numpy_array2(d, mapping)
+
+
+def _dict_to_numpy_array2(d, mapping=None):
     """Convert a dictionary of dictionaries to a 2d numpy array
     with optional mapping.
 
@@ -256,10 +273,24 @@ def dict_to_numpy_array2(d, mapping=None):
 
 
 def dict_to_numpy_array1(d, mapping=None):
-    """Convert a dictionary of numbers to a 1d numpy array
-    with optional mapping.
+    """Convert a dict of numbers to a 1d numpy array with optional mapping.
 
+    .. deprecated:: 2.8
+
+       dict_to_numpy_array1 is deprecated and will be removed in networkx 3.0.
+       Use dict_to_numpy_array instead.
     """
+    msg = (
+        "dict_to_numpy_array1 is deprecated and will be removed in networkx 3.0.\n"
+        "Use dict_to_numpy_array instead."
+    )
+    warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
+    return _dict_to_numpy_array1(d, mapping)
+
+
+def _dict_to_numpy_array1(d, mapping=None):
+    """Convert a dictionary of numbers to a 1d numpy array with optional mapping."""
     if mapping is None:
         s = set(d.keys())
         mapping = dict(zip(s, range(len(s))))
@@ -406,6 +437,10 @@ def groups(many_to_one):
 def to_tuple(x):
     """Converts lists to tuples.
 
+    .. deprecated:: 2.8
+
+       to_tuple is deprecated and will be removed in NetworkX 3.0.
+
     Examples
     --------
     >>> from networkx.utils import to_tuple
@@ -413,6 +448,12 @@ def to_tuple(x):
     >>> to_tuple(a_list)
     (1, 2, (1, 4))
     """
+    warnings.warn(
+        "to_tuple is deprecated and will be removed in NetworkX 3.0.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     if not isinstance(x, (tuple, list)):
         return x
     return tuple(map(to_tuple, x))
@@ -528,8 +569,8 @@ def create_py_random_state(random_state=None):
         generator used by `random`.
         if np.random package, return the global numpy random number
         generator wrapped in a PythonRandomInterface class.
-        if np.random.RandomState instance, return it wrapped in
-        PythonRandomInterface
+        if np.random.RandomState or np.random.Generator instance, return it
+        wrapped in PythonRandomInterface
         if a PythonRandomInterface instance, return it
     """
     import random
@@ -539,7 +580,7 @@ def create_py_random_state(random_state=None):
 
         if random_state is np.random:
             return PythonRandomInterface(np.random.mtrand._rand)
-        if isinstance(random_state, np.random.RandomState):
+        if isinstance(random_state, (np.random.RandomState, np.random.Generator)):
             return PythonRandomInterface(random_state)
         if isinstance(random_state, PythonRandomInterface):
             return random_state

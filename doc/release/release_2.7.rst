@@ -1,37 +1,5 @@
 .. _networkx_2.7:
 
-NetworkX 2.7.1
-==============
-
-Release date: 5 March 2022
-
-Supports Python 3.8, 3.9, and 3.10
-
-Minor bug fixes.
-
-Merged PRs
-----------
-
-A total of 7 changes have been committed.
-
-- Designate 2.7 release
-- Bump release version
-- Fix release notes
-- Change dev version to 2.7.1
-- Fix line graph construction for heterogeneous nodes (#5357)
-- Fix development banner (#5370)
-- Simplify DelayedImportErrorModule (#5371)
-- [nx_pylab] fix StopIteration, if empty dict is passed for labels. (#5372)
-
-Contributors
-------------
-
-- Jarrod Millman
-- Martin K. Scherer
-- Stefan van der Walt
-- jkudla
-
-
 NetworkX 2.7
 ============
 
@@ -364,7 +332,7 @@ A total of 166 changes have been committed.
 - Refactor `to_numpy_array` with advanced indexing (#5250)
 - Fix: Update louvain_partitions for threshold (update mod to new_mod in each level) (#5284)
 - Add exception for unconnected graph (#5287)
-- Fixing Tarjan's strongly connected components algorithm implementation to have O(|E|+|V|) time complexity instead of O(|V|^3). (#5288)
+- Fixing Tarjan's strongly connected components algorithm implementation to have `O(|E|+|V|)` time complexity instead of `O(|V|^3)`. (#5288)
 - Add weights to karate club graph (#5285)
 - Fix functions appearing in variables `__all__` but not in docs for NX2.7 (#5289)
 - Update to stable version of black (#5296)

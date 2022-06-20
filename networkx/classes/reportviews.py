@@ -83,6 +83,7 @@ EdgeDataView
     The argument `nbunch` restricts edges to those incident to nodes in nbunch.
 """
 from collections.abc import Mapping, Set
+
 import networkx as nx
 
 __all__ = [
@@ -1050,11 +1051,11 @@ class OutEdgeView(Set, Mapping):
     __slots__ = ("_adjdict", "_graph", "_nodes_nbrs")
 
     def __getstate__(self):
-        return {"_graph": self._graph}
+        return {"_graph": self._graph, "_adjdict": self._adjdict}
 
     def __setstate__(self, state):
-        self._graph = G = state["_graph"]
-        self._adjdict = G._succ if hasattr(G, "succ") else G._adj
+        self._graph = state["_graph"]
+        self._adjdict = state["_adjdict"]
         self._nodes_nbrs = self._adjdict.items
 
     @classmethod
@@ -1288,8 +1289,8 @@ class InEdgeView(OutEdgeView):
     __slots__ = ()
 
     def __setstate__(self, state):
-        self._graph = G = state["_graph"]
-        self._adjdict = G._pred if hasattr(G, "pred") else G._adj
+        self._graph = state["_graph"]
+        self._adjdict = state["_adjdict"]
         self._nodes_nbrs = self._adjdict.items
 
     dataview = InEdgeDataView
@@ -1400,8 +1401,8 @@ class InMultiEdgeView(OutMultiEdgeView):
     __slots__ = ()
 
     def __setstate__(self, state):
-        self._graph = G = state["_graph"]
-        self._adjdict = G._pred if hasattr(G, "pred") else G._adj
+        self._graph = state["_graph"]
+        self._adjdict = state["_adjdict"]
         self._nodes_nbrs = self._adjdict.items
 
     dataview = InMultiEdgeDataView
